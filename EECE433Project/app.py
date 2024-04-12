@@ -1,4 +1,6 @@
 import datetime
+from functools import wraps
+
 import jwt
 
 from flask import Flask, render_template, request, session, redirect
@@ -13,6 +15,14 @@ conn = psycopg2.connect(
 )
 
 SECRET_KEY = "b'|\xe7\xbfU3`\xc4\xec\xa7\xa9zf:}\xb5\xc7\xb9\x139^3@Dv'"
+
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'admin' not in session:
+            return redirect('/login')
+        return f(*args, **kwargs)
+    return decorated_function
 
 
 def create_token(user_id):
@@ -57,6 +67,8 @@ def login():
         if data is None:
             return "error"
         if data[1] == password:
+            if email == "admin@gmail.com":
+                session['admin'] = True
             session['token'] = create_token(data[0])
             return redirect("/")
     return render_template("login.html")
@@ -88,6 +100,12 @@ def register():
 def logout():
     session.clear()
     return redirect("/")
+
+@app.route('/admin')
+@admin_required
+def admin_panel():
+    # Admin functionalities
+    return render_template('admin_panel.html')
 
 
 if __name__ == '__main__':

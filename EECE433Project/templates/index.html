@@ -40,8 +40,8 @@
     {% else %}
     <a href="/logout" style="float: right;">Logout</a>
     {% endif %}
-    {% if admin %}
-    <a href="/createStaff" style="float: right;">Create Staff</a>
+    {% if session['admin'] == True %}
+    <a href="/admin">Admin Panel</a>
     {% endif %}
 </div>
 
