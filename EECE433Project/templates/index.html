@@ -34,7 +34,7 @@
     <a href="#">Home</a>
     <a href="#">About</a>
     <a href="#">Contact</a>
-    {% if not token %}
+    {% if not session['token'] %}
     <a href="/register" style="float: right;">Register</a>
     <a href="/login" style="float: right;">Login</a>
     {% else %}

@@ -16,12 +16,14 @@ conn = psycopg2.connect(
 
 SECRET_KEY = "b'|\xe7\xbfU3`\xc4\xec\xa7\xa9zf:}\xb5\xc7\xb9\x139^3@Dv'"
 
+
 def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if 'admin' not in session:
             return redirect('/login')
         return f(*args, **kwargs)
+
     return decorated_function
 
 
@@ -36,6 +38,7 @@ def create_token(user_id):
         SECRET_KEY,
         algorithm='HS256'
     )
+
 
 def extract_auth_token(authenticated_request):
     auth_header = authenticated_request.headers.get('Authorization')
@@ -52,8 +55,7 @@ def decode_token(token):
 
 @app.route('/')
 def index():
-    token = session.get('token')
-    return render_template("index.html", token=token)
+    return render_template("index.html")
 
 
 @app.route('/login', methods=["GET", "POST"])
@@ -62,7 +64,7 @@ def login():
         email = request.form["email"]
         password = request.form["password"]
         cursor = conn.cursor()
-        cursor.execute("select mid, pass from member where email =%s", (email,))
+        cursor.execute("select mid, pass from auth where email =%s", (email,))
         data = cursor.fetchone()
         if data is None:
             return "error"
@@ -100,6 +102,7 @@ def register():
 def logout():
     session.clear()
     return redirect("/")
+
 
 @app.route('/admin')
 @admin_required
