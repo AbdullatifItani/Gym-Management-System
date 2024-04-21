@@ -115,6 +115,214 @@ def admin_panel():
             return redirect("/create_class")
     return render_template('admin_panel.html')
 
+@app.route('/create_member', methods=["GET", "POST"])
+@admin_required
+def create_member():
+    if request.method == "POST":
+        fname = request.form["fname"]
+        lname = request.form["lname"]
+        email = request.form["email"]
+        password = request.form["password"]
+        gender = request.form["gender"]
+        dob = request.form["dob"]
+        contact = request.form["contact"]
+        joining_date = datetime.datetime.now().date()
+        
+        cursor = conn.cursor()
+        cursor.execute("""INSERT INTO MEMBER (FNAME, LNAME, GENDER, DOB, EMAIL, PASS, CONTACT, JOININGDATE)
+                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)""",
+                       (fname, lname, gender, dob, email, password, contact, joining_date))
+        conn.commit()
+        return redirect("/admin")
+    return render_template("create_member.html")
+
+
+@app.route('/assign_emergency_contact', methods=["GET", "POST"])
+@admin_required
+def create_emergency_contact():
+    if request.method == "POST":
+        emid = request.form["emid"]
+        ename = request.form["ename"]
+        contact = request.form["contact"]
+        
+        cursor = conn.cursor()
+        cursor.execute("""INSERT INTO EMERGENCY_CONTACT (EMID, ENAME, CONTACT)
+                        VALUES (%s, %s, %s)""",
+                       (emid, ename, contact))
+        conn.commit()
+        return redirect("/admin")
+    # Fetch member data to populate dropdowns
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM MEMBER")
+    member_data = cursor.fetchall()
+    return render_template("assign_emergency_contact.html", members=member_data)
+
+@app.route('/create_package', methods=["GET", "POST"])
+@admin_required
+def create_package():
+    if request.method == "POST":
+        pname = request.form["pname"]
+        price = request.form["price"]
+        description = request.form["description"]
+        duration = request.form["duration"]
+        
+        cursor = conn.cursor()
+        cursor.execute("""INSERT INTO PACKAGE (PNAME, DESCRIPTION, PRICE, DURATION)
+                        VALUES (%s, %s, %s, %s)""",
+                       (pname, description, price, duration))
+        conn.commit()
+        return redirect("/admin")
+    return render_template("create_package.html")
+
+@app.route('/assign_member_package', methods=["GET", "POST"])
+@admin_required
+def assign_member_package():
+    if request.method == "POST":
+        ppid = request.form["ppid"]
+        pmid = request.form["pmid"]
+        start_date = request.form["start_date"]
+        end_date = request.form["end_date"]
+        payment = request.form["payment"]
+        
+        cursor = conn.cursor()
+        cursor.execute("""INSERT INTO MEMBER_PACKAGE (PPID, PMID, START_DATE, END_DATE, PAYMENT)
+                        VALUES (%s, %s, %s, %s, %s)""",
+                       (ppid, pmid, start_date, end_date, payment))
+        conn.commit()
+        return redirect("/admin")
+    # Fetch member and package data to populate dropdowns
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM MEMBER")
+    member_data = cursor.fetchall()
+    cursor.execute("SELECT * FROM PACKAGE")
+    package_data = cursor.fetchall()
+    return render_template("assign_member_package.html", members=member_data, packages=package_data)
+
+
+@app.route('/create_review', methods=["GET", "POST"])
+@admin_required
+def create_review():
+    if request.method == "POST":
+        description = request.form["description"]
+        
+        cursor = conn.cursor()
+        cursor.execute("""INSERT INTO REVIEW (DESCRIPTION)
+                        VALUES (%s)""",
+                       (description,))
+        conn.commit()
+        return redirect("/admin")
+    return render_template("create_review.html")
+
+@app.route('/assign_member_review', methods=["GET", "POST"])
+@admin_required
+def assign_member_review():
+    if request.method == "POST":
+        member_id = request.form["member_id"]
+        review_id = request.form["review_id"]
+        
+        cursor = conn.cursor()
+        cursor.execute("""INSERT INTO MEMBER_REVIEW (RMID, RRID)
+                        VALUES (%s, %s)""",
+                       (member_id, review_id))
+        conn.commit()
+        return redirect("/admin")
+    # Fetch member and review data to populate dropdowns
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM MEMBER")
+    member_data = cursor.fetchall()
+    cursor.execute("SELECT * FROM REVIEW")
+    review_data = cursor.fetchall()
+    return render_template("assign_member_review.html", members=member_data, reviews=review_data)
+
+@app.route('/create_gym_session', methods=["GET", "POST"])
+@admin_required
+def create_gym_session():
+    if request.method == "POST":
+        date_time = request.form["date_time"]
+        
+        cursor = conn.cursor()
+        cursor.execute("""INSERT INTO GYM_SESSION (DATE_TIME)
+                        VALUES (%s)""",
+                       (date_time,))
+        conn.commit()
+        return redirect("/admin")
+    return render_template("create_gym_session.html")
+
+@app.route('/assign_member_gym_session', methods=["GET", "POST"])
+@admin_required
+def assign_member_gym_session():
+    if request.method == "POST":
+        member_id = request.form["member_id"]
+        date_time = request.form["date_time"]
+        
+        cursor = conn.cursor()
+        cursor.execute("""INSERT INTO MEMBER_GYM_SESSION (GMID, GDATE_TIME)
+                        VALUES (%s, %s)""",
+                       (member_id, date_time))
+        conn.commit()
+        return redirect("/admin")
+    # Fetch member and gym session data to populate dropdowns
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM MEMBER")
+    member_data = cursor.fetchall()
+    cursor.execute("SELECT * FROM GYM_SESSION")
+    gym_session_data = cursor.fetchall()
+    return render_template("assign_member_gym_session.html",members=member_data, gym_sessions=gym_session_data)
+
+@app.route('/create_class', methods=["GET", "POST"])
+@admin_required
+def create_class():
+    if request.method == "POST":
+        cname = request.form["cname"]
+        max_cap = request.form["max_cap"]
+        description = request.form["description"]
+        
+        cursor = conn.cursor()
+        cursor.execute("""INSERT INTO CLASS (CNAME, MAX_CAP, DESCRIPTION)
+                        VALUES (%s, %s, %s)""",
+                       (cname, max_cap, description))
+        conn.commit()
+        return redirect("/admin")
+    return render_template("create_class.html")
+
+@app.route('/create_equipment', methods=["GET", "POST"])
+@admin_required
+def create_equipment():
+    if request.method == "POST":
+        name = request.form["name"]
+        purchase = request.form["purchase"]
+        purchase_date = request.form["purchase_date"]
+        condition = request.form["condition"]
+        
+        cursor = conn.cursor()
+        cursor.execute("""INSERT INTO EQUIPMENT (NAME, PURCHASE, PURCHASE_DATE, CONDITION)
+                        VALUES (%s, %s, %s, %s)""",
+                       (name, purchase, purchase_date, condition))
+        conn.commit()
+        return redirect("/admin")
+    return render_template("create_equipment.html")
+
+@app.route('/assign_class_equipment', methods=["GET", "POST"])
+@admin_required
+def assign_equipment_to_class():
+    if request.method == "POST":
+        equipment_id = request.form["equipment_id"]
+        class_id = request.form["class_id"]
+        
+        cursor = conn.cursor()
+        cursor.execute("""INSERT INTO CLASS_EQUIPMENT (UEID, UCID)
+                        VALUES (%s, %s)""",
+                       (equipment_id, class_id))
+        conn.commit()
+        return redirect("/admin")
+    # Fetch equipment and class data to populate dropdowns
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM EQUIPMENT")
+    equipment_data = cursor.fetchall()
+    cursor.execute("SELECT * FROM CLASS")
+    class_data = cursor.fetchall()
+    return render_template("assign_class_equipment.html", equipment=equipment_data, classes=class_data)
+
 @app.route('/create_staff', methods=["GET", "POST"])
 @admin_required
 def create_staff():
@@ -138,22 +346,6 @@ def create_staff():
         return redirect("/admin")
     return render_template("create_staff.html")
 
-
-@app.route('/create_class', methods=["GET", "POST"])
-@admin_required
-def create_class():
-    if request.method == "POST":
-        cname = request.form["cname"]
-        max_cap = request.form["max_cap"]
-        description = request.form["description"]
-        
-        cursor = conn.cursor()
-        cursor.execute("""INSERT INTO CLASS (CNAME, MAX_CAP, DESCRIPTION)
-                        VALUES (%s, %s, %s)""",
-                       (cname, max_cap, description))
-        conn.commit()
-        return redirect("/admin")
-    return render_template("create_class.html")
 
 
 if __name__ == '__main__':
