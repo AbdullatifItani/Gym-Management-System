@@ -63,14 +63,20 @@ def login():
     if request.method == "POST":
         email = request.form["email"]
         password = request.form["password"]
+        staff = request.form["staff"]
         cursor = conn.cursor()
-        cursor.execute("select mid, pass from member where email =%s", (email,))
+        if staff:
+            cursor.execute("select sid, pass from staff where email =%s", (email,))
+        else:
+            cursor.execute("select mid, pass from member where email =%s", (email,))
         data = cursor.fetchone()
         if data is None:
             return "error"
         if data[1] == password:
             if email == "admin@gmail.com":
                 session['admin'] = True
+            if staff:
+                session['staff'] = True
             session['token'] = create_token(data[0])
             return redirect("/")
     return render_template("login.html")
