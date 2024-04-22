@@ -49,16 +49,16 @@
 <div class="container">
     <h2>Assign Equipment to Class</h2>
     <form action="/assign_class_equipment" method="POST">
-        <label for="equipment_id">Select Equipment:</label>
-        <select id="equipment_id" name="equipment_id" required>
-            {% for equipment_item in equipment %}
-            <option value="{{ equipment_item[0] }}">{{ equipment_item[0] }} - {{ equipment_item[1] }}</option>
+        <label for="ueid">Select Equipment:</label>
+        <select id="ueid" name="ueid" required>
+            {% for ueid in equipment %}
+            <option value="{{ ueid[0] }}">{{ ueid[0] }} - {{ ueid[1] }}</option>
             {% endfor %}
         </select><br>
-        <label for="class_id">Select Class:</label>
-        <select id="class_id" name="class_id" required>
-            {% for class_item in classes %}
-            <option value="{{ class_item[0] }}">{{ class_item[0] }} - {{ class_item[1] }}</option>
+        <label for="ucid">Select Class:</label>
+        <select id="ucid" name="ucid" required>
+            {% for ucid in classes %}
+            <option value="{{ ucid[0] }}">{{ ucid[0] }} - {{ ucid[1] }}</option>
             {% endfor %}
         </select><br>
         <input type="submit" value="Assign Equipment">

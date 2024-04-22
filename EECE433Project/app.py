@@ -121,10 +121,10 @@ def create_member():
     if request.method == "POST":
         fname = request.form["fname"]
         lname = request.form["lname"]
-        email = request.form["email"]
-        password = request.form["password"]
         gender = request.form["gender"]
         dob = request.form["dob"]
+        email = request.form["email"]
+        password = request.form["password"]
         contact = request.form["contact"]
         joining_date = datetime.datetime.now().date()
         
@@ -162,8 +162,8 @@ def create_emergency_contact():
 def create_package():
     if request.method == "POST":
         pname = request.form["pname"]
-        price = request.form["price"]
         description = request.form["description"]
+        price = request.form["price"]
         duration = request.form["duration"]
         
         cursor = conn.cursor()
@@ -217,13 +217,13 @@ def create_review():
 @admin_required
 def assign_member_review():
     if request.method == "POST":
-        member_id = request.form["member_id"]
-        review_id = request.form["review_id"]
+        rmid = request.form["rmid"]
+        rrid = request.form["rrid"]
         
         cursor = conn.cursor()
         cursor.execute("""INSERT INTO MEMBER_REVIEW (RMID, RRID)
                         VALUES (%s, %s)""",
-                       (member_id, review_id))
+                       (rmid, rrid))
         conn.commit()
         return redirect("/admin")
     # Fetch member and review data to populate dropdowns
@@ -252,13 +252,13 @@ def create_gym_session():
 @admin_required
 def assign_member_gym_session():
     if request.method == "POST":
-        member_id = request.form["member_id"]
-        date_time = request.form["date_time"]
+        gmid = request.form["gmid"]
+        gdate_time = request.form["gdate_time"]
         
         cursor = conn.cursor()
         cursor.execute("""INSERT INTO MEMBER_GYM_SESSION (GMID, GDATE_TIME)
                         VALUES (%s, %s)""",
-                       (member_id, date_time))
+                       (gmid, gdate_time))
         conn.commit()
         return redirect("/admin")
     # Fetch member and gym session data to populate dropdowns
@@ -304,15 +304,15 @@ def create_equipment():
 
 @app.route('/assign_class_equipment', methods=["GET", "POST"])
 @admin_required
-def assign_equipment_to_class():
+def assign_class_equipment():
     if request.method == "POST":
-        equipment_id = request.form["equipment_id"]
-        class_id = request.form["class_id"]
+        ueid = request.form["ueid"]
+        ucid = request.form["ucid"]
         
         cursor = conn.cursor()
         cursor.execute("""INSERT INTO CLASS_EQUIPMENT (UEID, UCID)
                         VALUES (%s, %s)""",
-                       (equipment_id, class_id))
+                       (ueid, ucid))
         conn.commit()
         return redirect("/admin")
     # Fetch equipment and class data to populate dropdowns
@@ -346,7 +346,71 @@ def create_staff():
         return redirect("/admin")
     return render_template("create_staff.html")
 
+@app.route('/assign_logs', methods=["GET", "POST"])
+def assign_logs():
+    if request.method == "POST":
+        leid = request.form["leid"]
+        lsid = request.form["lsid"]
+        ldate = request.form["ldate"]
+        details = request.form["details"]
+        cost = request.form["cost"]
+        
+        cursor = conn.cursor()
+        cursor.execute("""INSERT INTO LOGS (LEID, LSID, LDATE, DETAILS, COST)
+                          VALUES (%s, %s, %s, %s, %s)""",
+                       (leid, lsid, ldate, details, cost))
+        conn.commit()
+        return redirect("/admin")
+    # Fetch equipment and staff data to populate dropdowns
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM EQUIPMENT")
+    equipment_data = cursor.fetchall()
+    cursor.execute("SELECT * FROM STAFF")
+    staff_data = cursor.fetchall()
+    return render_template("assign_logs.html", equipment=equipment_data, staff=staff_data)
 
+@app.route('/assign_session', methods=["GET", "POST"])
+def assign_session():
+    if request.method == "POST":
+        scid = request.form["scid"]
+        ssid = request.form["ssid"]
+        sdate = request.form["sdate"]
+        
+        cursor = conn.cursor()
+        cursor.execute("""INSERT INTO SESSION (SCID, SSID, SDATE)
+                          VALUES (%s, %s, %s)""",
+                       (scid, ssid, sdate))
+        conn.commit()
+        return redirect("/admin")
+    # Fetch equipment and staff data to populate dropdowns
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM CLASS")
+    class_data = cursor.fetchall()
+    cursor.execute("SELECT * FROM STAFF")
+    staff_data = cursor.fetchall()
+    return render_template("assign_session.html", classes=class_data, staff=staff_data)
+
+@app.route('/assign_registered', methods=["GET", "POST"])
+def assign_registered():
+    if request.method == "POST":
+        regmid = request.form["regmid"]
+        regsid = request.form["regsid"]
+        regcid = request.form["regcid"]
+        regdate = request.form["regdate"]
+        
+        cursor = conn.cursor()
+        cursor.execute("""INSERT INTO REGISTERED (REGMID, REGSID, REGCID, REGDATE)
+                          VALUES (%s, %s, %s, %s)""",
+                       (regmid, regsid, regcid, regdate))
+        conn.commit()
+        return redirect("/admin")
+    # Fetch equipment and staff data to populate dropdowns
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM MEMBER")
+    member_data = cursor.fetchall()
+    cursor.execute("SELECT * FROM SESSION")
+    session_data = cursor.fetchall()
+    return render_template("assign_registered.html", members=member_data, sessions=session_data)
 
 if __name__ == '__main__':
     app.run()

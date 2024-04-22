@@ -52,7 +52,7 @@
         <label for="emid">Member ID:</label>
         <select id="emid" name="emid" required>
             {% for emid in members %}
-            <option value="{{ emid[0] }}">{{ emid[0] }} - {{ emid[1] }} - {{ emid[2] }}</option>
+            <option value="{{ emid[0] }}">{{ emid[0] }} - {{ emid[1] }} {{ emid[2] }}</option>
             {% endfor %}
         </select><br>
         <label for="ename">Emergency Contact Name:</label>

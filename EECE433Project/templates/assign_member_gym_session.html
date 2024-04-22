@@ -53,7 +53,7 @@
         <label for="gmid">Member ID:</label>
         <select id="gmid" name="gmid" required>
             {% for gmid in members %}
-            <option value="{{ gmid[0] }}">{{ gmid[0] }} - {{ gmid[1] }} - {{ gmid[2] }}</option>
+            <option value="{{ gmid[0] }}">{{ gmid[0] }} - {{ gmid[1] }} {{ gmid[2] }}</option>
             {% endfor %}
         </select><br>
         <label for="gdate_time">Date and Time:</label>

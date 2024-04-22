@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Assign Member Package</title>
+    <title>Logs</title>
     <style>
         /* Add your CSS styles here */
         body {
@@ -24,11 +24,12 @@
             width: 300px;
         }
         input[type="number"],
-        input[type="date"],
+        input[type="datetime-local"],
         input[type="submit"] {
             width: 100%;
             padding: 10px;
-            margin-bottom: 15px;
+            margin: 8px 0;
+            display: inline-block;
             border: 1px solid #ccc;
             border-radius: 4px;
             box-sizing: border-box;
@@ -38,7 +39,6 @@
             color: white;
             border: none;
             cursor: pointer;
-            border-radius: 4px;
         }
         input[type="submit"]:hover {
             background-color: #45a049;
@@ -48,29 +48,29 @@
 <body>
 
 <div class="container">
-    <h2>Assign Member Package</h2>
-    <form action="/assign_member_package" method="POST">
-        <label for="ppid">Package ID:</label>
-        <select id="ppid" name="ppid" required>
-            {% for ppid in packages %}
-            <option value="{{ ppid[0] }}">{{ ppid[0] }} - {{ ppid[1] }} - {{ ppid[2] }}</option>
+    <h2>Assign Logs</h2>
+    <form action="/assign_logs" method="POST">
+        <label for="leid">Select Equipment:</label>
+        <select id="leid" name="leid" required>
+            {% for leid in equipment %}
+            <option value="{{ leid[0] }}">{{ leid[0] }} - {{ leid[1] }}</option>
             {% endfor %}
         </select><br>
-        <label for="pmid">Member ID:</label>
-        <select id="pmid" name="pmid" required>
-            {% for pmid in members %}
-            <option value="{{ pmid[0] }}">{{ pmid[0] }} - {{ pmid[1] }} {{ pmid[2] }}</option>
+        <label for="lsid">Select Staff:</label>
+        <select id="lsid" name="lsid" required>
+            {% for lsid in staff %}
+            <option value="{{ lsid[0] }}">{{ lsid[0] }} - {{ lsid[1] }} {{ lsid[2] }}</option>
             {% endfor %}
         </select><br>
-        <label for="start_date">Start Date:</label>
-        <input type="date" id="start_date" name="start_date" required><br>
-        <label for="end_date">End Date:</label>
-        <input type="date" id="end_date" name="end_date" required><br>
-        <label for="payment">Payment:</label>
-        <input type="number" id="payment" name="payment" min="0" required><br>
-        <input type="submit" value="Assign Member Package">
+        <label for="ldate">Log Date:</label>
+        <input type="date" id="ldate" name="ldate" required><br>
+        <label for="details">Details:</label>
+        <input type="text" id="details" name="details" required><br>
+        <label for="cost">Cost:</label>
+        <input type="number" id="cost" name="cost"><br>
+        <input type="submit" value="Assign Logs">
     </form>
 </div>
-
+    
 </body>
 </html>

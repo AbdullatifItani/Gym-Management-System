@@ -49,13 +49,13 @@
 <div class="container">
     <h2>Assign Member Review</h2>
     <form action="/assign_member_review" method="POST">
-        <label for="member_id">Member ID:</label>
+        <label for="rmid">Member ID:</label>
         <select id="rmid" name="rmid" required>
             {% for rmid in members %}
-            <option value="{{ rmid[0] }}">{{ rmid[0] }} - {{ rmid[1] }} - {{ rmid[2] }}</option>
+            <option value="{{ rmid[0] }}">{{ rmid[0] }} - {{ rmid[1] }} {{ rmid[2] }}</option>
             {% endfor %}
         </select><br>
-        <label for="review_id">Review ID:</label>
+        <label for="rrid">Review ID:</label>
         <select id="rrid" name="rrid" required>
             {% for rrid in reviews %}
             <option value="{{ rrid[0] }}">{{ rrid[0] }} - {{ rrid[1] }}</option>
