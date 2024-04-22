@@ -9,10 +9,10 @@ import psycopg2
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 
-conn = psycopg2.connect( 
-    database="Gym Management", user="postgres", 
-    password="Abed12345", host="127.0.0.1", port="5432" 
-    )
+conn = psycopg2.connect(
+    database="gym", user="postgres",
+    password="mysql123", host="127.0.0.1", port="5432"
+)
 
 SECRET_KEY = "b'|\xe7\xbfU3`\xc4\xec\xa7\xa9zf:}\xb5\xc7\xb9\x139^3@Dv'"
 
@@ -182,12 +182,11 @@ def assign_member_package():
         pmid = request.form["pmid"]
         start_date = request.form["start_date"]
         end_date = request.form["end_date"]
-        payment = request.form["payment"]
         
         cursor = conn.cursor()
-        cursor.execute("""INSERT INTO MEMBER_PACKAGE (PPID, PMID, START_DATE, END_DATE, PAYMENT)
-                        VALUES (%s, %s, %s, %s, %s)""",
-                       (ppid, pmid, start_date, end_date, payment))
+        cursor.execute("""INSERT INTO MEMBER_PACKAGE (PPID, PMID, START_DATE, END_DATE)
+                        VALUES (%s, %s, %s, %s)""",
+                       (ppid, pmid, start_date, end_date))
         conn.commit()
         return redirect("/admin")
     # Fetch member and package data to populate dropdowns
@@ -204,35 +203,21 @@ def assign_member_package():
 def create_review():
     if request.method == "POST":
         description = request.form["description"]
-        
+        token = session["token"]
+        mid = decode_token(token)
         cursor = conn.cursor()
         cursor.execute("""INSERT INTO REVIEW (DESCRIPTION)
                         VALUES (%s)""",
                        (description,))
         conn.commit()
-        return redirect("/admin")
-    return render_template("create_review.html")
-
-@app.route('/assign_member_review', methods=["GET", "POST"])
-@admin_required
-def assign_member_review():
-    if request.method == "POST":
-        rmid = request.form["rmid"]
-        rrid = request.form["rrid"]
-        
-        cursor = conn.cursor()
+        cursor.execute("""SELECT RID FROM REVIEW""")
+        rid = cursor.fetchone()[0]
         cursor.execute("""INSERT INTO MEMBER_REVIEW (RMID, RRID)
-                        VALUES (%s, %s)""",
-                       (rmid, rrid))
+                                VALUES (%s, %s)""",
+                       (mid, rid))
         conn.commit()
         return redirect("/admin")
-    # Fetch member and review data to populate dropdowns
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM MEMBER")
-    member_data = cursor.fetchall()
-    cursor.execute("SELECT * FROM REVIEW")
-    review_data = cursor.fetchall()
-    return render_template("assign_member_review.html", members=member_data, reviews=review_data)
+    return render_template("create_review.html")
 
 @app.route('/create_gym_session', methods=["GET", "POST"])
 @admin_required
@@ -290,14 +275,13 @@ def create_class():
 def create_equipment():
     if request.method == "POST":
         name = request.form["name"]
-        purchase = request.form["purchase"]
         purchase_date = request.form["purchase_date"]
         condition = request.form["condition"]
         
         cursor = conn.cursor()
-        cursor.execute("""INSERT INTO EQUIPMENT (NAME, PURCHASE, PURCHASE_DATE, CONDITION)
-                        VALUES (%s, %s, %s, %s)""",
-                       (name, purchase, purchase_date, condition))
+        cursor.execute("""INSERT INTO EQUIPMENT (NAME, PURCHASE_DATE, CONDITION)
+                        VALUES (%s, %s, %s)""",
+                       (name, purchase_date, condition))
         conn.commit()
         return redirect("/admin")
     return render_template("create_equipment.html")
