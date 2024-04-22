@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Delete Member Package</title>
     <style>
+        /* Add your CSS styles here */
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
@@ -20,52 +21,42 @@
             padding: 20px;
             border-radius: 5px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            width: 300px;
+            width: 400px; /* Adjust width as needed */
         }
-        input[type="text"],
-        input[type="password"],
-        input[type="submit"] {
+        select, input[type="submit"] {
             width: 100%;
             padding: 10px;
-            margin: 8px 0;
-            display: inline-block;
+            margin-bottom: 15px;
             border: 1px solid #ccc;
             border-radius: 4px;
             box-sizing: border-box;
         }
         input[type="submit"] {
-            background-color: #4caf50;
+            background-color: #ff4444;
             color: white;
             border: none;
             cursor: pointer;
+            border-radius: 4px;
         }
         input[type="submit"]:hover {
-            background-color: #45a049;
-        }
-        .error-message {
-            color: #ff0000; /* Red color for error message */
-            font-size: 16px;
+            background-color: #cc0000;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>Login</h2>
-    <form action="/login" method="POST">
-        <label for="email">Email:</label>
-        <input type="text" id="email" name="email" required>
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required>
-        <input type="checkbox" id="staff" name="staff" value="False">
-        <label for="staff">Login as Staff</label><br>
-        <input type="submit" value="Login">
+    <h2>Delete Member Package</h2>
+    <form action="/delete_member_package" method="POST">
+        <label for="member_package_id">Select Member Package ID to Delete:</label>
+        <select id="member_package_id" name="member_package_id" required>
+            {% for member_package in member_packages %}
+            <option value="{{ member_package[0] }}">{{ member_package[0] }} - {{ member_package[1] }}</option>
+            {% endfor %}
+        </select><br>
+        <input type="submit" value="Delete Member Package">
     </form>
-    {% if error %}
-    <p class="error-message">{{ error }}</p>
-    {% endif %}
 </div>
-
 
 </body>
 </html>

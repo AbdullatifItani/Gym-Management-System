@@ -10,8 +10,8 @@ app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 
 conn = psycopg2.connect(
-    database="gym", user="postgres",
-    password="mysql123", host="127.0.0.1", port="5432"
+    database="Gym", user="postgres",
+    password="pikacrafter", host="127.0.0.1", port="5432"
 )
 
 SECRET_KEY = "b'|\xe7\xbfU3`\xc4\xec\xa7\xa9zf:}\xb5\xc7\xb9\x139^3@Dv'"
@@ -63,7 +63,7 @@ def login():
     if request.method == "POST":
         email = request.form["email"]
         password = request.form["password"]
-        staff = request.form["staff"]
+        staff = request.form.get("staff")
         cursor = conn.cursor()
         if staff:
             cursor.execute("select sid, pass from staff where email =%s", (email,))
@@ -71,9 +71,9 @@ def login():
             cursor.execute("select mid, pass from member where email =%s", (email,))
         data = cursor.fetchone()
         if data is None:
-            return "error"
+            return render_template("login.html", error="Incorrect Login Information")
         if data[1] == password:
-            if email == "admin@gmail.com":
+            if email == "admin@gmail.com" and staff:
                 session['admin'] = True
             if staff:
                 session['staff'] = True
@@ -142,6 +142,27 @@ def create_member():
         return redirect("/admin")
     return render_template("create_member.html")
 
+@app.route('/delete_member', methods=["GET", "POST"])
+@admin_required
+def delete_member():
+    if request.method == "POST":
+        mid = request.form["mid"]
+        
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM MEMBER")
+        existing_members = cursor.fetchall()
+        
+        cursor.execute("DELETE FROM MEMBER WHERE MID = %s", (mid,))
+        conn.commit()
+        
+        return redirect("/admin")
+    
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM MEMBER")
+    existing_members = cursor.fetchall()
+    return render_template("delete_member.html", members=existing_members)
+
+
 
 @app.route('/assign_emergency_contact', methods=["GET", "POST"])
 @admin_required
@@ -163,6 +184,33 @@ def create_emergency_contact():
     member_data = cursor.fetchall()
     return render_template("assign_emergency_contact.html", members=member_data)
 
+@app.route('/delete_emergency_contact', methods=["GET", "POST"])
+@admin_required
+def delete_emergency_contact():
+    if request.method == "POST":
+        emid = request.form["emid"]
+        
+        cursor = conn.cursor()
+        # Check if the emergency contact exists
+        cursor.execute("SELECT * FROM EMERGENCY_CONTACT WHERE EMID = %s", (emid,))
+        contact_data = cursor.fetchone()
+        if contact_data is None:
+            return "Emergency contact not found."
+        
+        # Delete the emergency contact
+        cursor.execute("DELETE FROM EMERGENCY_CONTACT WHERE EMID = %s", (emid,))
+        conn.commit()
+        
+        return redirect("/admin")
+    
+    # Fetch emergency contact data to populate dropdowns
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM EMERGENCY_CONTACT")
+    contact_data = cursor.fetchall()
+    
+    return render_template("delete_emergency_contact.html", contacts=contact_data)
+
+
 @app.route('/create_package', methods=["GET", "POST"])
 @admin_required
 def create_package():
@@ -179,6 +227,23 @@ def create_package():
         conn.commit()
         return redirect("/admin")
     return render_template("create_package.html")
+
+@app.route('/delete_package', methods=["GET", "POST"])
+@admin_required
+def delete_package():
+    if request.method == "POST":
+        package_id = request.form["package_id"]
+        
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM PACKAGE WHERE PID = %s", (package_id,))
+        conn.commit()
+        return redirect("/admin")
+    
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM PACKAGE")
+    package_data = cursor.fetchall()
+    return render_template("delete_package.html", packages=package_data)
+
 
 @app.route('/assign_member_package', methods=["GET", "POST"])
 @admin_required
@@ -203,6 +268,26 @@ def assign_member_package():
     package_data = cursor.fetchall()
     return render_template("assign_member_package.html", members=member_data, packages=package_data)
 
+@app.route('/delete_member_package', methods=["GET", "POST"])
+@admin_required
+def delete_member_package():
+    if request.method == "POST":
+        member_package_id = request.form["member_package_id"]
+
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM MEMBER_PACKAGE WHERE MEMBER_PACKAGE_ID = %s", (member_package_id,))
+        conn.commit()
+        return redirect("/admin")
+
+    # Fetch member and package data to populate dropdowns
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM MEMBER_PACKAGE")
+    member_packages = cursor.fetchall()
+
+    return render_template("delete_member_package.html", member_packages=member_packages)
+
+
+
 
 @app.route('/create_review', methods=["GET", "POST"])
 @admin_required
@@ -225,6 +310,23 @@ def create_review():
         return redirect("/admin")
     return render_template("create_review.html")
 
+@app.route('/delete_review', methods=["GET","POST"])
+@admin_required
+def delete_review():
+    if request.method == "POST":
+        review_id = request.form["review_id"]
+
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM REVIEW WHERE RID = %s", (review_id,))
+        conn.commit()
+        return redirect("/admin")
+
+    cursor = conn.cursor()
+    cursor.execute("SELECT RID, DESCRIPTION FROM REVIEW")
+    review_data = cursor.fetchall()
+    return render_template("delete_review.html", reviews=review_data)
+
+
 @app.route('/create_gym_session', methods=["GET", "POST"])
 @admin_required
 def create_gym_session():
@@ -238,6 +340,26 @@ def create_gym_session():
         conn.commit()
         return redirect("/admin")
     return render_template("create_gym_session.html")
+
+@app.route('/delete_gym_session', methods=["GET", "POST"])
+@admin_required
+def delete_gym_session():
+    if request.method == "POST":
+        date_time = request.form["date_time"]
+        
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM GYM_SESSION WHERE DATE_TIME = %s", (date_time,))
+        conn.commit()
+        return redirect("/admin")
+
+    # Fetch gym session data to populate dropdown
+    cursor = conn.cursor()
+    cursor.execute("SELECT DATE_TIME FROM GYM_SESSION")
+    gym_sessions = cursor.fetchall()
+
+    return render_template("delete_gym_session.html", gym_sessions=gym_sessions)
+
+
 
 @app.route('/assign_member_gym_session', methods=["GET", "POST"])
 @admin_required
@@ -260,6 +382,23 @@ def assign_member_gym_session():
     gym_session_data = cursor.fetchall()
     return render_template("assign_member_gym_session.html",members=member_data, gym_sessions=gym_session_data)
 
+@app.route('/delete_member_gym_session', methods=["GET", "POST"])
+@admin_required
+def delete_member_gym_session():
+    if request.method == "POST":
+        gdate_time = request.form["gdate_time"]
+        
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM MEMBER_GYM_SESSION WHERE GDATE_TIME = %s", (gdate_time,))
+        conn.commit()
+        return redirect("/admin")
+    
+    cursor = conn.cursor()
+    cursor.execute("SELECT GMID, GDATE_TIME FROM MEMBER_GYM_SESSION")
+    gym_sessions = cursor.fetchall()
+    
+    return render_template("delete_member_gym_session.html", gym_sessions=gym_sessions)
+
 @app.route('/create_class', methods=["GET", "POST"])
 @admin_required
 def create_class():
@@ -276,6 +415,24 @@ def create_class():
         return redirect("/admin")
     return render_template("create_class.html")
 
+@app.route('/delete_class', methods=["GET", "POST"])
+@admin_required
+def delete_class():
+    if request.method == "POST":
+        cid = request.form["cid"]
+
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM CLASS WHERE CID = %s", (cid,))
+        conn.commit()
+        return redirect("/admin")
+
+    cursor = conn.cursor()
+    cursor.execute("SELECT CID, CNAME FROM CLASS")
+    classes = cursor.fetchall()
+
+    return render_template("delete_class.html", classes=classes)
+
+
 @app.route('/create_equipment', methods=["GET", "POST"])
 @admin_required
 def create_equipment():
@@ -291,6 +448,24 @@ def create_equipment():
         conn.commit()
         return redirect("/admin")
     return render_template("create_equipment.html")
+
+@app.route('/delete_equipment', methods=["GET", "POST"])
+@admin_required
+def delete_equipment():
+    if request.method == "POST":
+        eid = request.form["eid"]
+
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM EQUIPMENT WHERE EID = %s", (eid,))
+        conn.commit()
+        return redirect("/admin")
+
+    cursor = conn.cursor()
+    cursor.execute("SELECT EID, NAME FROM EQUIPMENT")
+    equipments = cursor.fetchall()
+
+    return render_template("delete_equipment.html", equipments=equipments)
+
 
 @app.route('/assign_class_equipment', methods=["GET", "POST"])
 @admin_required
@@ -312,6 +487,25 @@ def assign_class_equipment():
     cursor.execute("SELECT * FROM CLASS")
     class_data = cursor.fetchall()
     return render_template("assign_class_equipment.html", equipment=equipment_data, classes=class_data)
+
+@app.route('/delete_class_equipment', methods=["GET", "POST"])
+@admin_required
+def delete_class_equipment():
+    if request.method == "POST":
+        ceid = request.form["ceid"]
+
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM CLASS_EQUIPMENT WHERE UEID = %s", (ceid,))
+        conn.commit()
+        return redirect("/admin")
+
+    # Fetch class equipment data to populate dropdown
+    cursor = conn.cursor()
+    cursor.execute("SELECT UEID, UCID FROM CLASS_EQUIPMENT")
+    class_equipment_data = cursor.fetchall()
+
+    return render_template("delete_class_equipment.html", class_equipment=class_equipment_data)
+
 
 @app.route('/create_staff', methods=["GET", "POST"])
 @admin_required
@@ -336,6 +530,25 @@ def create_staff():
         return redirect("/admin")
     return render_template("create_staff.html")
 
+@app.route('/delete_staff', methods=["GET", "POST"])
+@admin_required
+def delete_staff():
+    if request.method == "POST":
+        sid = request.form["sid"]
+
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM STAFF WHERE SID = %s", (sid,))
+        conn.commit()
+        return redirect("/admin")
+
+    # Fetch staff data to populate dropdown
+    cursor = conn.cursor()
+    cursor.execute("SELECT SID, FNAME, LNAME FROM STAFF")
+    staff_data = cursor.fetchall()
+
+    return render_template("delete_staff.html", staff=staff_data)
+
+
 @app.route('/assign_logs', methods=["GET", "POST"])
 def assign_logs():
     if request.method == "POST":
@@ -359,6 +572,25 @@ def assign_logs():
     staff_data = cursor.fetchall()
     return render_template("assign_logs.html", equipment=equipment_data, staff=staff_data)
 
+@app.route('/delete_logs', methods=["GET", "POST"])
+@admin_required
+def delete_logs():
+    if request.method == "POST":
+        lid = request.form["lid"]
+
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM LOGS WHERE LID = %s", (lid,))
+        conn.commit()
+        return redirect("/admin")
+
+    # Fetch logs data to populate dropdown
+    cursor = conn.cursor()
+    cursor.execute("SELECT LID, LEID, LSID, LDATE, Details FROM LOGS")
+    logs_data = cursor.fetchall()
+
+    return render_template("delete_logs.html", logs=logs_data)
+
+
 @app.route('/assign_session', methods=["GET", "POST"])
 def assign_session():
     if request.method == "POST":
@@ -379,6 +611,27 @@ def assign_session():
     cursor.execute("SELECT * FROM STAFF")
     staff_data = cursor.fetchall()
     return render_template("assign_session.html", classes=class_data, staff=staff_data)
+
+@app.route('/delete_session', methods=["GET", "POST"])
+@admin_required
+def delete_session():
+    if request.method == "POST":
+        scid = request.form["scid"]
+        ssid = request.form["ssid"]
+        sdate = request.form["sdate"]
+
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM SESSION WHERE SCID = %s AND SSID = %s AND SDATE = %s", (scid, ssid, sdate))
+        conn.commit()
+        return redirect("/admin")
+
+    # Fetch session data to populate dropdown
+    cursor = conn.cursor()
+    cursor.execute("SELECT SCID, SSID, SDATE FROM SESSION")
+    session_data = cursor.fetchall()
+
+    return render_template("delete_session.html", sessions=session_data)
+
 
 @app.route('/assign_registered', methods=["GET", "POST"])
 def assign_registered():
@@ -402,5 +655,27 @@ def assign_registered():
     session_data = cursor.fetchall()
     return render_template("assign_registered.html", members=member_data, sessions=session_data)
 
+@app.route('/delete_registered', methods=["GET", "POST"])
+@admin_required
+def delete_registered():
+    if request.method == "POST":
+        regmid = request.form["regmid"]
+        regsid = request.form["regsid"]
+        regcid = request.form["regcid"]
+        regdate = request.form["regdate"]
+
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM REGISTERED WHERE REGMID = %s AND REGSID = %s AND REGCID = %s AND REGDATE = %s", (regmid, regsid, regcid, regdate))
+        conn.commit()
+        return redirect("/admin")
+
+    # Fetch registered data to populate dropdown
+    cursor = conn.cursor()
+    cursor.execute("SELECT REGMID, REGSID, REGCID, REGDATE FROM REGISTERED")
+    registered_data = cursor.fetchall()
+
+    return render_template("delete_registered.html", registered=registered_data)
+
+
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)

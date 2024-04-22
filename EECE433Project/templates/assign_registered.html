@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assign Registered</title>
+    <style>
+        /* Add your CSS styles here */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+        select,
+        button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            cursor: pointer;
+        }
+        button {
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        p.error {
+            color: #ff0000;
+            margin-top: -10px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Assign Registered</h2>
+    <form method="POST">
+        <label for="regmid">Select Member:</label>
+        <select name="regmid" id="regmid">
+            {% for member in members %}
+                <option value="{{ member[0] }}">{{ member[1] }} {{ member[2] }}</option>
+            {% endfor %}
+        </select>
+        <label for="regsid">Select Staff:</label>
+        <select name="regsid" id="regsid">
+            {% for session in sessions %}
+                <option value="{{ session[0] }}">{{ session[1] }} {{ session[2] }} {{ session[3] }}</option>
+            {% endfor %}
+        </select>
+        <label for="regcid">Select Class:</label>
+        <select name="regcid" id="regcid">
+            {% for session in sessions %}
+                <option value="{{ session[0] }}">{{ session[1] }} {{ session[2] }} {{ session[3] }}</option>
+            {% endfor %}
+        </select>
+        <label for="regdate">Registration Date:</label>
+        <input type="date" name="regdate" id="regdate">
+        <button type="submit">Assign Registered</button>
+    </form>
+    {% if error %}
+        <p class="error">{{ error }}</p>
+    {% endif %}
+</div>
+
+</body>
+</html>

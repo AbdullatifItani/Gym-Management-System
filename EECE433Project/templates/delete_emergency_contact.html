@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Delete Emergency Contact</title>
     <style>
+        /* Add your CSS styles here */
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
@@ -22,50 +23,41 @@
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             width: 300px;
         }
-        input[type="text"],
-        input[type="password"],
-        input[type="submit"] {
+        select {
             width: 100%;
             padding: 10px;
-            margin: 8px 0;
-            display: inline-block;
+            margin-bottom: 15px;
             border: 1px solid #ccc;
             border-radius: 4px;
             box-sizing: border-box;
         }
         input[type="submit"] {
-            background-color: #4caf50;
+            background-color: #ff4444;
             color: white;
             border: none;
             cursor: pointer;
+            border-radius: 4px;
+            padding: 10px;
         }
         input[type="submit"]:hover {
-            background-color: #45a049;
-        }
-        .error-message {
-            color: #ff0000; /* Red color for error message */
-            font-size: 16px;
+            background-color: #cc0000;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>Login</h2>
-    <form action="/login" method="POST">
-        <label for="email">Email:</label>
-        <input type="text" id="email" name="email" required>
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required>
-        <input type="checkbox" id="staff" name="staff" value="False">
-        <label for="staff">Login as Staff</label><br>
-        <input type="submit" value="Login">
+    <h2>Delete Emergency Contact</h2>
+    <form action="/delete_emergency_contact" method="POST">
+        <label for="emid">Select Emergency Contact:</label>
+        <select id="emid" name="emid" required>
+            {% for contact in contacts %}
+            <option value="{{ contact[0] }}">{{ contact[0] }} - {{ contact[1] }} - {{ contact[2] }}</option>
+            {% endfor %}
+        </select><br>
+        <input type="submit" value="Delete Emergency Contact">
     </form>
-    {% if error %}
-    <p class="error-message">{{ error }}</p>
-    {% endif %}
 </div>
-
 
 </body>
 </html>

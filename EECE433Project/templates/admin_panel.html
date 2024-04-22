@@ -1,57 +1,128 @@
-<h1>Admin Panel</h1>
-<div>
-    <h2>Manage Members</h2>
-    <a href="/create_member">Create Member</a> 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh; /* Adjusted minimum height */
+            overflow-y: auto; /* Added overflow for vertical scrolling */
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            width: 600px;
+            margin: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        h2 {
+            margin-top: 20px;
+            color: #666;
+        }
+        a {
+            display: block;
+            text-decoration: none;
+            color: #333;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        a:hover {
+            background-color: #ccc;
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Admin Panel</h1>
+    <div>
+        <h2>Manage Members</h2>
+        <a href="/create_member">Create Member</a>
+        <a href="/delete_member">Delete Member</a> 
+    </div>
+    <div>
+        <h2>Manage Emergency Contacts</h2>
+        <a href="/assign_emergency_contact">Assign Emergency Contact</a>
+        <a href="/delete_emergency_contact">Delete Emergency Contact</a> 
+    </div>
+    <div>
+        <h2>Manage Packages</h2>
+        <a href="/create_package">Create Package</a>
+        <a href="/delete_package">Delete Package</a> 
+    </div>
+    <div>
+        <h2>Manage Member Packages</h2>
+        <a href="/assign_member_package">Assign Member Package</a>
+        <a href="/delete_member_package">Delete Member Package</a>
+    </div>
+    <div>
+        <h2>Manage Reviews</h2>
+        <a href="/create_review">Create Review</a>
+        <a href="/delete_review">Delete Review</a> 
+    </div>
+    <div>
+        <h2>Manage Gym Sessions</h2>
+        <a href="/create_gym_session">Create Gym Session</a>
+        <a href="/delete_gym_session">Delete Gym Session</a>
+    </div>
+    <div>
+        <h2>Manage Member Gym Sessions</h2>
+        <a href="/assign_member_gym_session">Assign Member Gym Session</a>
+        <a href="/delete_member_gym_session">Delete Member Gym Session</a>
+    </div>
+    <div>
+        <h2>Manage Classes</h2>
+        <a href="/create_class">Create Class</a>
+        <a href="/delete_class">Delete Class</a>
+    </div>
+    <div>
+        <h2>Manage Equipment</h2>
+        <a href="/create_equipment">Create Equipment</a>
+        <a href="/delete_equipment">Delete Equipment</a>
+    </div>
+    <div>
+        <h2>Manage Class Equipment</h2>
+        <a href="/assign_class_equipment">Assign Class Equipment</a>
+        <a href="/delete_class_equipment">Delete Class Equipment</a>
+    </div>
+    <div>
+        <h2>Manage Staff</h2>
+        <a href="/create_staff">Create Staff</a>
+        <a href="/delete_staff">Delete Staff</a>
+    </div>
+    <div>
+        <h2>Manage Logs</h2>
+        <a href="/assign_logs">Assign Logs</a>
+        <a href="/delete_logs">Delete Logs</a>
+    </div>
+    <div>
+        <h2>Manage Sessions</h2>
+        <a href="/assign_session">Assign Session</a>
+        <a href="/delete_session">Delete Session</a>
+    </div>
+    <div>
+        <h2>Manage Registered</h2>
+        <a href="/assign_registered">Assign Registered</a>
+        <a href="/delete_registered">Delete Registered</a>
+    </div>
 </div>
-<div>
-    <h2>Manage Emergency Contacts</h2>
-    <a href="/assign_emergency_contact">Assign Emergency Contact</a> 
-</div>
-<div>
-    <h2>Manage Packages</h2>
-    <a href="/create_package">Create Package</a> 
-</div>
-<div>
-    <h2>Manage Member Packages</h2>
-    <a href="/assign_member_package">Assign Member Package</a> 
-</div>
-<div>
-    <h2>Manage Reviews</h2>
-    <a href="/create_review">Create Review</a> 
-</div>
-<div>
-    <h2>Manage Gym Sessions</h2>
-    <a href="/create_gym_session">Create Gym Session</a> 
-</div>
-<div>
-    <h2>Manage Member Gym Sessions</h2>
-    <a href="/assign_member_gym_session">Assign Member Gym Session</a> 
-</div>
-<div>
-    <h2>Manage Classes</h2>
-    <a href="/create_class">Create Class</a> 
-</div>
-<div>
-    <h2>Manage Equipment</h2>
-    <a href="/create_equipment">Create Equipment</a> 
-</div>
-<div>
-    <h2>Manage Class Equipment</h2>
-    <a href="/assign_class_equipment">Assign Class Equipment</a> 
-</div>
-<div>
-    <h2>Manage Staff</h2>
-    <a href="/create_staff">Create Staff</a> 
-</div>
-<div>
-    <h2>Manage Logs</h2>
-    <a href="/assign_logs">Assign Logs</a> 
-</div>
-<div>
-    <h2>Manage Sessions</h2>
-    <a href="/assign_session">Assign Session</a> 
-</div>
-<div>
-    <h2>Manage Registered</h2>
-    <a href="/assign_registered">Assign Registered</a> 
-</div>
+
+</body>
+</html>
