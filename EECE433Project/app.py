@@ -311,7 +311,7 @@ def update_package_details():
 
         # If no fields are provided for update, return an error
         if not update_values:
-            return render_template("update_package.html", packages=packages, error="At least one field must be provided for update")
+            return render_template("update_package.html", packages=packages, error="At least one field must be provided for the update to occur")
 
         # Remove the trailing comma and space from the query
         update_query = update_query.rstrip(",") + " WHERE PID = %s"
@@ -518,6 +518,57 @@ def create_class():
         return redirect("/admin")
     return render_template("create_class.html")
 
+@app.route('/update_class', methods=["GET", "POST"])
+@admin_required
+def update_class_details():
+    if request.method == "POST":
+        # Get the form data
+        cid = request.form["cid"]
+        max_cap = request.form["max_cap"]
+        description = request.form["description"]
+        
+        # Construct the UPDATE query based on provided form data
+        update_query = "UPDATE CLASS SET"
+        update_values = []
+
+        if max_cap:
+            update_query += " MAX_CAP = %s,"
+            update_values.append(max_cap)
+
+        if description:
+            update_query += " DESCRIPTION = %s,"
+            update_values.append(description)
+            
+        # Fetch class data from the database
+        cursor = conn.cursor()
+        cursor.execute("SELECT CID, CNAME FROM CLASS")
+        classes = cursor.fetchall()
+
+        # If no fields are provided for update, return an error
+        if not update_values:
+            return render_template("update_class.html", classes=classes, error="At least one field must be provided for the update to occur")
+
+        # Remove the trailing comma and space from the query
+        update_query = update_query.rstrip(",") + " WHERE CID = %s"
+        update_values.append(cid)
+
+        # Execute the UPDATE query
+        cursor = conn.cursor()
+        cursor.execute(update_query, update_values)
+        conn.commit()
+        
+        # Redirect to a confirmation page or back to the admin panel
+        return redirect("/admin")
+    
+    # Fetch class data from the database
+    cursor = conn.cursor()
+    cursor.execute("SELECT CID, CNAME FROM CLASS")
+    classes = cursor.fetchall()
+    
+    # Render the form for updating class details and pass class data to the template
+    return render_template("update_class.html", classes=classes)
+
+
 @app.route('/delete_class', methods=["GET", "POST"])
 @admin_required
 def delete_class():
@@ -591,6 +642,51 @@ def assign_class_equipment():
     class_data = cursor.fetchall()
     return render_template("assign_class_equipment.html", equipment=equipment_data, classes=class_data)
 
+@app.route('/update_equipment', methods=["GET", "POST"])
+@admin_required
+def update_equipment():
+    if request.method == "POST":
+        # Get the form data
+        eid = request.form["eid"]
+        condition = request.form["condition"]
+        
+        # Construct the UPDATE query based on the provided form data
+        update_query = "UPDATE EQUIPMENT SET"
+        update_values = []
+
+        if condition:
+            update_query += " CONDITION = %s,"
+            update_values.append(condition)
+
+        # If no fields are provided for update, return an error
+        if not update_values:
+            # Fetch equipment data from the database
+            cursor = conn.cursor()
+            cursor.execute("SELECT EID, NAME FROM EQUIPMENT")
+            equipment = cursor.fetchall()
+            return render_template("update_equipment.html", equipment=equipment, error="At least one field must be provided for update")
+
+        # Remove the trailing comma and space from the query
+        update_query = update_query.rstrip(",") + " WHERE EID = %s"
+        update_values.append(eid)
+
+        # Execute the UPDATE query
+        cursor = conn.cursor()
+        cursor.execute(update_query, update_values)
+        conn.commit()
+        
+        # Redirect to a confirmation page or back to the admin panel
+        return redirect("/admin")
+    
+    # Fetch equipment data from the database
+    cursor = conn.cursor()
+    cursor.execute("SELECT EID, NAME FROM EQUIPMENT")
+    equipment = cursor.fetchall()
+    
+    # Render the form for updating equipment details and pass equipment data to the template
+    return render_template("update_equipment.html", equipment=equipment)
+
+
 @app.route('/delete_class_equipment', methods=["GET", "POST"])
 @admin_required
 def delete_class_equipment():
@@ -632,6 +728,61 @@ def create_staff():
         conn.commit()
         return redirect("/admin")
     return render_template("create_staff.html")
+
+@app.route('/update_staff', methods=["GET", "POST"])
+@admin_required
+def update_staff():
+    if request.method == "POST":
+        # Get the form data
+        sid = request.form["sid"]
+        contact = request.form["contact"]
+        salary = request.form["salary"]
+        position = request.form["position"]
+        
+        # Construct the UPDATE query based on provided form data
+        update_query = "UPDATE STAFF SET"
+        update_values = []
+
+        if contact:
+            update_query += " CONTACT = %s,"
+            update_values.append(contact)
+
+        if salary:
+            update_query += " SALARY = %s,"
+            update_values.append(salary)
+
+        if position:
+            update_query += " POSITION = %s,"
+            update_values.append(position)
+            
+        # If no fields are provided for update, return an error
+        if not update_values:
+            # Fetch staff data from the database
+            cursor = conn.cursor()
+            cursor.execute("SELECT SID, FNAME, LNAME FROM STAFF")
+            staff = cursor.fetchall()
+            return render_template("update_staff.html", staff=staff, error="At least one field must be provided for update")
+
+        # Remove the trailing comma and space from the query
+        update_query = update_query.rstrip(",") + " WHERE SID = %s"
+        update_values.append(sid)
+
+        # Execute the UPDATE query
+        cursor = conn.cursor()
+        cursor.execute(update_query, update_values)
+        conn.commit()
+        
+        # Redirect to a confirmation page or back to the admin panel
+        return redirect("/admin")
+    
+    # Fetch staff data from the database
+    cursor = conn.cursor()
+    cursor.execute("SELECT SID, FNAME, LNAME FROM STAFF")
+    staff = cursor.fetchall()
+    
+    # Render the form for updating staff details and pass staff data to the template
+    return render_template("update_staff.html", staff=staff)
+
 
 @app.route('/delete_staff', methods=["GET", "POST"])
 @admin_required
