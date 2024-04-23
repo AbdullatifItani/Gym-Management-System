@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Emergency Contact</title>
+    <style>
+        /* Add your CSS styles here */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+        select,
+        input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        input[type="submit"] {
+            background-color: #ffcc00; /* Yellowish color */
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        input[type="submit"]:hover {
+            background-color: #ffaa00; /* Darker shade of yellow on hover */
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Update Emergency Contact</h2>
+    <form method="POST">
+        <label for="emid">Select Emergency Contact:</label>
+        <select name="emid" id="emid" required>
+            {% for contact in emergency_contacts %}
+                <option value="{{ contact[0] }}">{{ contact[1] }} - {{ contact[2] }}</option>
+            {% endfor %}
+        </select><br>
+        <label for="new_contact">New Contact Information:</label>
+        <input type="text" name="new_contact" id="new_contact" required><br><br>
+        <input type="submit" value="Update Contact">
+    </form>
+</div>
+
+
+</body>
+</html>

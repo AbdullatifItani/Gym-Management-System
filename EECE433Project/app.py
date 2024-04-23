@@ -142,6 +142,31 @@ def create_member():
         return redirect("/admin")
     return render_template("create_member.html")
 
+@app.route('/update_member_contact', methods=["GET", "POST"])
+@admin_required
+def update_member_contact():
+    if request.method == "POST":
+        # Get the form data
+        mid = request.form["mid"]
+        new_contact = request.form["new_contact"]
+        
+        # Update member contact information in the database
+        cursor = conn.cursor()
+        cursor.execute("UPDATE MEMBER SET CONTACT = %s WHERE MID = %s", (new_contact, mid))
+        conn.commit()
+        
+        # Redirect to a confirmation page or back to the admin panel
+        return redirect("/admin")
+    
+    # Fetch member data from the database
+    cursor = conn.cursor()
+    cursor.execute("SELECT MID, FNAME, LNAME FROM MEMBER")
+    member_data = cursor.fetchall()
+    
+    # Render the form for updating member contact and pass member data to the template
+    return render_template("update_member_contact.html", members=member_data)
+
+
 @app.route('/delete_member', methods=["GET", "POST"])
 @admin_required
 def delete_member():
@@ -183,6 +208,31 @@ def create_emergency_contact():
     cursor.execute("SELECT * FROM MEMBER")
     member_data = cursor.fetchall()
     return render_template("assign_emergency_contact.html", members=member_data)
+
+@app.route('/update_emergency_contact', methods=["GET", "POST"])
+@admin_required
+def update_emergency_contact():
+    if request.method == "POST":
+        # Get the form data
+        emid = request.form["emid"]
+        new_contact = request.form["new_contact"]
+        
+        # Update emergency contact information in the database
+        cursor = conn.cursor()
+        cursor.execute("UPDATE EMERGENCY_CONTACT SET CONTACT = %s WHERE EMID = %s", (new_contact, emid))
+        conn.commit()
+        
+        # Redirect to a confirmation page or back to the admin panel
+        return redirect("/admin")
+    
+    # Fetch emergency contact data from the database
+    cursor = conn.cursor()
+    cursor.execute("SELECT EMID, ENAME, CONTACT FROM EMERGENCY_CONTACT")
+    emergency_contacts = cursor.fetchall()
+    
+    # Render the form for updating emergency contact and pass emergency contact data to the template
+    return render_template("update_emergency_contact.html", emergency_contacts=emergency_contacts)
+
 
 @app.route('/delete_emergency_contact', methods=["GET", "POST"])
 @admin_required
@@ -227,6 +277,59 @@ def create_package():
         conn.commit()
         return redirect("/admin")
     return render_template("create_package.html")
+
+@app.route('/update_package', methods=["GET", "POST"])
+@admin_required
+def update_package_details():
+    if request.method == "POST":
+        # Get the form data
+        pid = request.form["pid"]
+        description = request.form["description"]
+        price = request.form["price"]
+        duration = request.form["duration"]
+        
+        # Construct the UPDATE query based on provided form data
+        update_query = "UPDATE PACKAGE SET"
+        update_values = []
+
+        if description:
+            update_query += " DESCRIPTION = %s,"
+            update_values.append(description)
+
+        if price:
+            update_query += " PRICE = %s,"
+            update_values.append(price)
+
+        if duration:
+            update_query += " DURATION = %s,"
+            update_values.append(duration)
+            
+        # Fetch package data from the database
+        cursor = conn.cursor()
+        cursor.execute("SELECT PID, PNAME FROM PACKAGE")
+        packages = cursor.fetchall()
+
+        # If no fields are provided for update, return an error
+        if not update_values:
+            return render_template("update_package.html", packages=packages, error="At least one field must be provided for update")
+
+        # Remove the trailing comma and space from the query
+        update_query = update_query.rstrip(",") + " WHERE PID = %s"
+        update_values.append(pid)
+
+        # Execute the UPDATE query
+        cursor = conn.cursor()
+        cursor.execute(update_query, update_values)
+        conn.commit()
+        
+        # Redirect to a confirmation page or back to the admin panel
+        return redirect("/admin")
+    
+    cursor = conn.cursor()
+    cursor.execute("SELECT PID, PNAME FROM PACKAGE")
+    packages = cursor.fetchall()
+    # Render the form for updating package details and pass package data to the template
+    return render_template("update_package.html", packages=packages)
 
 @app.route('/delete_package', methods=["GET", "POST"])
 @admin_required
