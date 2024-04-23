@@ -48,11 +48,11 @@
 
 <div class="container">
     <h2>Delete Member Package</h2>
-    <form action="/delete_member_package" method="POST">
-        <label for="member_package_id">Select Member Package:</label>
-        <select id="member_package_id" name="member_package_id" required>
-            {% for member_package in member_packages %}
-            <option value="{{ member_package[0] }}">{{ member_package[0] }} - {{ member_package[1] }}</option>
+    <form action="/delete_package" method="POST">
+        <label for="package_id">Select Member Package:</label>
+        <select id="package_id" name="package_id" required>
+            {% for package in packages %}
+            <option value="{{ package[0] }}">{{ package[0] }} - {{ package[1] }}</option>
             {% endfor %}
         </select><br>
         <input type="submit" value="Delete Member Package">

@@ -21,16 +21,20 @@
             padding: 20px;
             border-radius: 5px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            width: 300px;
+            width: 500px;
         }
-        select,
-        input[type="submit"] {
+        table {
             width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
             border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
         }
         input[type="submit"] {
             background-color: #ffcc00; /* Yellowish color */
@@ -38,6 +42,7 @@
             border: none;
             cursor: pointer;
             border-radius: 4px;
+            padding: 10px;
         }
         input[type="submit"]:hover {
             background-color: #ffaa00; /* Darker shade of yellow on hover */
@@ -46,21 +51,102 @@
 </head>
 <body>
 
-<div class="container">
+    <div class="container">
     <h2>Update Emergency Contact</h2>
-    <form method="POST">
-        <label for="emid">Select Emergency Contact:</label>
-        <select name="emid" id="emid" required>
-            {% for contact in emergency_contacts %}
-                <option value="{{ contact[0] }}">{{ contact[1] }} - {{ contact[2] }}</option>
-            {% endfor %}
-        </select><br>
+
+    <form method="POST" id="contactForm">
+        <table>
+            <thead>
+                <tr>
+                    <th>Select</th>
+                    <th>Member ID</th>
+                    <th>Name</th>
+                    <th>Contact</th>
+                </tr>
+            </thead>
+            <tbody id="contactTableBody">
+                {% for contact in emergency_contacts %}
+                    <tr>
+                        <td>
+                            <input type="radio" name="emid_name" value="{{ contact[0] }}|{{ contact[1] }}" required>
+
+                        </td>
+                        <td>{{ contact[0] }}</td>
+                        <td>{{ contact[1] }}</td>
+                        <td>{{ contact[2] }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div id="pagination">
+            <button type="button" id="prevBtn" disabled>Prev</button>
+            <button type="button" id="nextBtn">Next</button>
+        </div>
+
         <label for="new_contact">New Contact Information:</label>
         <input type="text" name="new_contact" id="new_contact" required><br><br>
         <input type="submit" value="Update Contact">
     </form>
 </div>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+    const contacts = JSON.parse('{{ emergency_contacts|tojson }}');
+    const tableBody = document.getElementById('contactTableBody');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    let currentPage = 1;
+    const itemsPerPage = 10;
+
+    function displayContacts(page) {
+        const start = (page - 1) * itemsPerPage;
+        const end = start + itemsPerPage;
+        const paginatedContacts = contacts.slice(start, end);
+
+        tableBody.innerHTML = ''; // Clear table body
+
+        paginatedContacts.forEach(contact => {
+            const row = `
+                <tr>
+                    <td>
+                        <input type="radio" name="emid_name" value="${contact[0]}|${contact[1]}" required>
+                    </td>
+                    <td>${contact[0]}</td>
+                    <td>${contact[1]}</td>
+                    <td>${contact[2]}</td>
+                </tr>
+            `;
+            tableBody.innerHTML += row;
+        });
+
+        // Check if there are more contacts to display
+        if (contacts.length <= end) {
+            nextBtn.disabled = true;
+        } else {
+            nextBtn.disabled = false;
+        }
+    }
+
+    nextBtn.addEventListener('click', function() {
+        currentPage++;
+        displayContacts(currentPage);
+        prevBtn.disabled = false;
+    });
+
+    prevBtn.addEventListener('click', function() {
+        currentPage--;
+        displayContacts(currentPage);
+        if (currentPage === 1) {
+            prevBtn.disabled = true;
+        }
+        nextBtn.disabled = false; // Enable next button when going back
+    });
+
+    displayContacts(currentPage);
+    });
+
+</script>
 
 </body>
 </html>

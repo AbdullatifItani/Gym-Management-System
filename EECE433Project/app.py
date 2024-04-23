@@ -1,56 +1,41 @@
-import datetime
-from functools import wraps
-
-import jwt
-
-from flask import Flask, render_template, request, session, redirect
+from flask import Flask, render_template, session, redirect
 import psycopg2
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 
+from .db_config import DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT
+
 conn = psycopg2.connect(
-    database="Gym", user="postgres",
-    password="pikacrafter", host="127.0.0.1", port="5432"
+    database=DB_NAME,
+    user=DB_USER,
+    password=DB_PASSWORD,
+    host=DB_HOST,
+    port=DB_PORT
 )
 
-SECRET_KEY = "b'|\xe7\xbfU3`\xc4\xec\xa7\xa9zf:}\xb5\xc7\xb9\x139^3@Dv'"
-
-
-def admin_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if 'admin' not in session:
-            return redirect('/login')
-        return f(*args, **kwargs)
-
-    return decorated_function
-
-
-def create_token(user_id):
-    payload = {
-        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=4),
-        'iat': datetime.datetime.utcnow(),
-        'sub': user_id
-    }
-    return jwt.encode(
-        payload,
-        SECRET_KEY,
-        algorithm='HS256'
-    )
-
-
-def extract_auth_token(authenticated_request):
-    auth_header = authenticated_request.headers.get('Authorization')
-    if auth_header:
-        return auth_header.split(" ")[1]
-    else:
-        return None
-
-
-def decode_token(token):
-    payload = jwt.decode(token, SECRET_KEY, 'HS256')
-    return payload['sub']
+from EECE433Project.services import admin_service
+from EECE433Project.services.registered_service import assign_registered_service, delete_registered_service
+from EECE433Project.services.session_service import assign_session_service, delete_session_service
+from EECE433Project.services.staff_service import create_staff_service, update_staff_service, delete_staff_service
+from EECE433Project.services.class_equipment_service import assign_class_equipment_service, \
+    delete_class_equipment_service
+from EECE433Project.services.equipment_service import create_equipment_service, delete_equipment_service, \
+    update_equipment_service
+from EECE433Project.services.class_service import create_class_service, update_class_service, delete_class_service
+from EECE433Project.services.member_gym_session_service import assign_member_gym_session_service, \
+    delete_member_gym_session_service
+from EECE433Project.services.gym_session_service import create_gym_session_service, delete_gym_session_service
+from .services.package_service import create_package_service, update_package_service, delete_package_service
+from EECE433Project.services.member_package_service import assign_member_package_service, delete_member_package_service
+from EECE433Project.services.member_service import create_member_service, update_member_contact_service, \
+    delete_member_service
+from EECE433Project.services.emergency_contact_service import assign_emergency_contact_service, \
+    update_emergency_contact_service, delete_emergency_contact_service
+from EECE433Project.services.auth_service import login_service, register_service
+from EECE433Project.services.logs_service import assign_logs_service, delete_logs_service
+from EECE433Project.services.review_service import create_review_service, delete_review_service
+from EECE433Project.helper_functions import admin_required
 
 
 @app.route('/')
@@ -58,50 +43,33 @@ def index():
     return render_template("index.html")
 
 
-@app.route('/login', methods=["GET", "POST"])
-def login():
-    if request.method == "POST":
-        email = request.form["email"]
-        password = request.form["password"]
-        staff = request.form.get("staff")
-        cursor = conn.cursor()
-        if staff:
-            cursor.execute("select sid, pass from staff where email =%s", (email,))
-        else:
-            cursor.execute("select mid, pass from member where email =%s", (email,))
-        data = cursor.fetchone()
-        if data is None:
-            return render_template("login.html", error="Incorrect Login Information")
-        if data[1] == password:
-            if email == "admin@gmail.com" and staff:
-                session['admin'] = True
-            if staff:
-                session['staff'] = True
-            session['token'] = create_token(data[0])
-            return redirect("/")
-    return render_template("login.html")
+@app.route('/about')
+def about():
+    return render_template("about.html")
+
+
+@app.route('/contact')
+def contact():
+    return render_template("contact.html")
+
+
+@app.route('/admin')
+@admin_required
+def admin():
+    return admin_service.admin()
+
+
+# Auth Service Start #
 
 
 @app.route('/register', methods=["GET", "POST"])
 def register():
-    if request.method == "POST":
-        fname = request.form["fname"]
-        lname = request.form["lname"]
-        email = request.form["email"]
-        password = request.form["password"]
-        gender = request.form["gender"]
-        dob = request.form["dob"]
-        contact = request.form["contact"]
-        cursor = conn.cursor()
-        cursor.execute("""INSERT INTO MEMBER (FNAME, LNAME, GENDER, DOB, EMAIL, PASS, CONTACT, JOININGDATE)
-                        VALUES (%s, %s, %s, %s, %s, %s, %s, 'now()')""",
-                       (fname, lname, gender, dob, email, password, contact))
-        conn.commit()
-        cursor.execute("select mid from member where email =%s", (email,))
-        data = cursor.fetchone()
-        session['token'] = create_token(data[0])
-        return redirect("/")
-    return render_template("register.html")
+    return register_service.register(conn)
+
+
+@app.route('/login', methods=["GET", "POST"])
+def login():
+    return login_service.login(conn)
 
 
 @app.route('/logout')
@@ -110,825 +78,264 @@ def logout():
     return redirect("/")
 
 
-@app.route('/admin')
-@admin_required
-def admin_panel():
-    # Admin functionalities
-    if request.method == "POST":
-        if request.form.get("action") == "create_staff":
-            return redirect("/create_staff")
-        elif request.form.get("action") == "create_class":
-            return redirect("/create_class")
-    return render_template('admin_panel.html')
+# Auth Service End #
+# Member Service Start #
+
 
 @app.route('/create_member', methods=["GET", "POST"])
 @admin_required
 def create_member():
-    if request.method == "POST":
-        fname = request.form["fname"]
-        lname = request.form["lname"]
-        gender = request.form["gender"]
-        dob = request.form["dob"]
-        email = request.form["email"]
-        password = request.form["password"]
-        contact = request.form["contact"]
-        joining_date = datetime.datetime.now().date()
-        
-        cursor = conn.cursor()
-        cursor.execute("""INSERT INTO MEMBER (FNAME, LNAME, GENDER, DOB, EMAIL, PASS, CONTACT, JOININGDATE)
-                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)""",
-                       (fname, lname, gender, dob, email, password, contact, joining_date))
-        conn.commit()
-        return redirect("/admin")
-    return render_template("create_member.html")
+    return create_member_service.create_member(conn)
+
 
 @app.route('/update_member_contact', methods=["GET", "POST"])
 @admin_required
 def update_member_contact():
-    if request.method == "POST":
-        # Get the form data
-        mid = request.form["mid"]
-        new_contact = request.form["new_contact"]
-        
-        # Update member contact information in the database
-        cursor = conn.cursor()
-        cursor.execute("UPDATE MEMBER SET CONTACT = %s WHERE MID = %s", (new_contact, mid))
-        conn.commit()
-        
-        # Redirect to a confirmation page or back to the admin panel
-        return redirect("/admin")
-    
-    # Fetch member data from the database
-    cursor = conn.cursor()
-    cursor.execute("SELECT MID, FNAME, LNAME FROM MEMBER")
-    member_data = cursor.fetchall()
-    
-    # Render the form for updating member contact and pass member data to the template
-    return render_template("update_member_contact.html", members=member_data)
+    return update_member_contact_service.update_member_contact(conn)
 
 
 @app.route('/delete_member', methods=["GET", "POST"])
 @admin_required
 def delete_member():
-    if request.method == "POST":
-        mid = request.form["mid"]
-        
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM MEMBER")
-        existing_members = cursor.fetchall()
-        
-        cursor.execute("DELETE FROM MEMBER WHERE MID = %s", (mid,))
-        conn.commit()
-        
-        return redirect("/admin")
-    
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM MEMBER")
-    existing_members = cursor.fetchall()
-    return render_template("delete_member.html", members=existing_members)
+    return delete_member_service.delete_member(conn)
 
+
+# Member Service End #
+# Emergency Contact Service Start #
 
 
 @app.route('/assign_emergency_contact', methods=["GET", "POST"])
 @admin_required
-def create_emergency_contact():
-    if request.method == "POST":
-        emid = request.form["emid"]
-        ename = request.form["ename"]
-        contact = request.form["contact"]
-        
-        cursor = conn.cursor()
-        cursor.execute("""INSERT INTO EMERGENCY_CONTACT (EMID, ENAME, CONTACT)
-                        VALUES (%s, %s, %s)""",
-                       (emid, ename, contact))
-        conn.commit()
-        return redirect("/admin")
-    # Fetch member data to populate dropdowns
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM MEMBER")
-    member_data = cursor.fetchall()
-    return render_template("assign_emergency_contact.html", members=member_data)
+def assign_emergency_contact():
+    return assign_emergency_contact_service.assign_emergency_contact(conn)
+
 
 @app.route('/update_emergency_contact', methods=["GET", "POST"])
 @admin_required
 def update_emergency_contact():
-    if request.method == "POST":
-        # Get the form data
-        emid = request.form["emid"]
-        new_contact = request.form["new_contact"]
-        
-        # Update emergency contact information in the database
-        cursor = conn.cursor()
-        cursor.execute("UPDATE EMERGENCY_CONTACT SET CONTACT = %s WHERE EMID = %s", (new_contact, emid))
-        conn.commit()
-        
-        # Redirect to a confirmation page or back to the admin panel
-        return redirect("/admin")
-    
-    # Fetch emergency contact data from the database
-    cursor = conn.cursor()
-    cursor.execute("SELECT EMID, ENAME, CONTACT FROM EMERGENCY_CONTACT")
-    emergency_contacts = cursor.fetchall()
-    
-    # Render the form for updating emergency contact and pass emergency contact data to the template
-    return render_template("update_emergency_contact.html", emergency_contacts=emergency_contacts)
+    return update_emergency_contact_service.update_emergency_contact(conn)
 
 
 @app.route('/delete_emergency_contact', methods=["GET", "POST"])
 @admin_required
 def delete_emergency_contact():
-    if request.method == "POST":
-        emid = request.form["emid"]
-        
-        cursor = conn.cursor()
-        # Check if the emergency contact exists
-        cursor.execute("SELECT * FROM EMERGENCY_CONTACT WHERE EMID = %s", (emid,))
-        contact_data = cursor.fetchone()
-        if contact_data is None:
-            return "Emergency contact not found."
-        
-        # Delete the emergency contact
-        cursor.execute("DELETE FROM EMERGENCY_CONTACT WHERE EMID = %s", (emid,))
-        conn.commit()
-        
-        return redirect("/admin")
-    
-    # Fetch emergency contact data to populate dropdowns
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM EMERGENCY_CONTACT")
-    contact_data = cursor.fetchall()
-    
-    return render_template("delete_emergency_contact.html", contacts=contact_data)
+    return delete_emergency_contact_service.delete_emergency_contact(conn)
+
+
+# Emergency Contact Service End #
+# Package Service Start #
 
 
 @app.route('/create_package', methods=["GET", "POST"])
 @admin_required
 def create_package():
-    if request.method == "POST":
-        pname = request.form["pname"]
-        description = request.form["description"]
-        price = request.form["price"]
-        duration = request.form["duration"]
-        
-        cursor = conn.cursor()
-        cursor.execute("""INSERT INTO PACKAGE (PNAME, DESCRIPTION, PRICE, DURATION)
-                        VALUES (%s, %s, %s, %s)""",
-                       (pname, description, price, duration))
-        conn.commit()
-        return redirect("/admin")
-    return render_template("create_package.html")
+    return create_package_service.create_package(conn)
+
 
 @app.route('/update_package', methods=["GET", "POST"])
 @admin_required
-def update_package_details():
-    if request.method == "POST":
-        # Get the form data
-        pid = request.form["pid"]
-        description = request.form["description"]
-        price = request.form["price"]
-        duration = request.form["duration"]
-        
-        # Construct the UPDATE query based on provided form data
-        update_query = "UPDATE PACKAGE SET"
-        update_values = []
+def update_package():
+    return update_package_service.update_package(conn)
 
-        if description:
-            update_query += " DESCRIPTION = %s,"
-            update_values.append(description)
-
-        if price:
-            update_query += " PRICE = %s,"
-            update_values.append(price)
-
-        if duration:
-            update_query += " DURATION = %s,"
-            update_values.append(duration)
-            
-        # Fetch package data from the database
-        cursor = conn.cursor()
-        cursor.execute("SELECT PID, PNAME FROM PACKAGE")
-        packages = cursor.fetchall()
-
-        # If no fields are provided for update, return an error
-        if not update_values:
-            return render_template("update_package.html", packages=packages, error="At least one field must be provided for the update to occur")
-
-        # Remove the trailing comma and space from the query
-        update_query = update_query.rstrip(",") + " WHERE PID = %s"
-        update_values.append(pid)
-
-        # Execute the UPDATE query
-        cursor = conn.cursor()
-        cursor.execute(update_query, update_values)
-        conn.commit()
-        
-        # Redirect to a confirmation page or back to the admin panel
-        return redirect("/admin")
-    
-    cursor = conn.cursor()
-    cursor.execute("SELECT PID, PNAME FROM PACKAGE")
-    packages = cursor.fetchall()
-    # Render the form for updating package details and pass package data to the template
-    return render_template("update_package.html", packages=packages)
 
 @app.route('/delete_package', methods=["GET", "POST"])
 @admin_required
 def delete_package():
-    if request.method == "POST":
-        package_id = request.form["package_id"]
-        
-        cursor = conn.cursor()
-        cursor.execute("DELETE FROM PACKAGE WHERE PID = %s", (package_id,))
-        conn.commit()
-        return redirect("/admin")
-    
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM PACKAGE")
-    package_data = cursor.fetchall()
-    return render_template("delete_package.html", packages=package_data)
+    return delete_package_service.delete_package(conn)
+
+
+# Package Service End #
+# Member Package Service Start #
 
 
 @app.route('/assign_member_package', methods=["GET", "POST"])
 @admin_required
 def assign_member_package():
-    if request.method == "POST":
-        ppid = request.form["ppid"]
-        pmid = request.form["pmid"]
-        start_date = request.form["start_date"]
-        end_date = request.form["end_date"]
-        
-        cursor = conn.cursor()
-        cursor.execute("""INSERT INTO MEMBER_PACKAGE (PPID, PMID, START_DATE, END_DATE)
-                        VALUES (%s, %s, %s, %s)""",
-                       (ppid, pmid, start_date, end_date))
-        conn.commit()
-        return redirect("/admin")
-    # Fetch member and package data to populate dropdowns
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM MEMBER")
-    member_data = cursor.fetchall()
-    cursor.execute("SELECT * FROM PACKAGE")
-    package_data = cursor.fetchall()
-    return render_template("assign_member_package.html", members=member_data, packages=package_data)
+    return assign_member_package_service.assign_member_package(conn)
+
 
 @app.route('/delete_member_package', methods=["GET", "POST"])
 @admin_required
 def delete_member_package():
-    if request.method == "POST":
-        member_package_id = request.form["member_package_id"]
-
-        cursor = conn.cursor()
-        cursor.execute("DELETE FROM MEMBER_PACKAGE WHERE MEMBER_PACKAGE_ID = %s", (member_package_id,))
-        conn.commit()
-        return redirect("/admin")
-
-    # Fetch member and package data to populate dropdowns
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM MEMBER_PACKAGE")
-    member_packages = cursor.fetchall()
-
-    return render_template("delete_member_package.html", member_packages=member_packages)
+    return delete_member_package_service.delete_member_package(conn)
 
 
+# Member Package Service End #
+# Review Service Start #
 
 
 @app.route('/create_review', methods=["GET", "POST"])
 @admin_required
 def create_review():
-    if request.method == "POST":
-        description = request.form["description"]
-        token = session["token"]
-        mid = decode_token(token)
-        cursor = conn.cursor()
-        cursor.execute("""INSERT INTO REVIEW (DESCRIPTION)
-                        VALUES (%s)""",
-                       (description,))
-        conn.commit()
-        cursor.execute("""SELECT RID FROM REVIEW""")
-        rid = cursor.fetchone()[0]
-        cursor.execute("""INSERT INTO MEMBER_REVIEW (RMID, RRID)
-                                VALUES (%s, %s)""",
-                       (mid, rid))
-        conn.commit()
-        return redirect("/admin")
-    return render_template("create_review.html")
+    return create_review_service.create_review(conn)
 
-@app.route('/delete_review', methods=["GET","POST"])
+
+@app.route('/delete_review', methods=["GET", "POST"])
 @admin_required
 def delete_review():
-    if request.method == "POST":
-        review_id = request.form["review_id"]
+    return delete_review_service.delete_review(conn)
 
-        cursor = conn.cursor()
-        cursor.execute("DELETE FROM REVIEW WHERE RID = %s", (review_id,))
-        conn.commit()
-        return redirect("/admin")
 
-    cursor = conn.cursor()
-    cursor.execute("SELECT RID, DESCRIPTION FROM REVIEW")
-    review_data = cursor.fetchall()
-    return render_template("delete_review.html", reviews=review_data)
+# Review Service End #
+# Gym Session Service Start #
 
 
 @app.route('/create_gym_session', methods=["GET", "POST"])
 @admin_required
 def create_gym_session():
-    if request.method == "POST":
-        date_time = request.form["date_time"]
-        
-        cursor = conn.cursor()
-        cursor.execute("""INSERT INTO GYM_SESSION (DATE_TIME)
-                        VALUES (%s)""",
-                       (date_time,))
-        conn.commit()
-        return redirect("/admin")
-    return render_template("create_gym_session.html")
+    return create_gym_session_service.create_gym_session(conn)
+
 
 @app.route('/delete_gym_session', methods=["GET", "POST"])
 @admin_required
 def delete_gym_session():
-    if request.method == "POST":
-        date_time = request.form["date_time"]
-        
-        cursor = conn.cursor()
-        cursor.execute("DELETE FROM GYM_SESSION WHERE DATE_TIME = %s", (date_time,))
-        conn.commit()
-        return redirect("/admin")
+    return delete_gym_session_service.delete_gym_session(conn)
 
-    # Fetch gym session data to populate dropdown
-    cursor = conn.cursor()
-    cursor.execute("SELECT DATE_TIME FROM GYM_SESSION")
-    gym_sessions = cursor.fetchall()
 
-    return render_template("delete_gym_session.html", gym_sessions=gym_sessions)
-
+# Gym Session Service End #
+# Member Gym Session Service Start #
 
 
 @app.route('/assign_member_gym_session', methods=["GET", "POST"])
 @admin_required
 def assign_member_gym_session():
-    if request.method == "POST":
-        gmid = request.form["gmid"]
-        gdate_time = request.form["gdate_time"]
-        
-        cursor = conn.cursor()
-        cursor.execute("""INSERT INTO MEMBER_GYM_SESSION (GMID, GDATE_TIME)
-                        VALUES (%s, %s)""",
-                       (gmid, gdate_time))
-        conn.commit()
-        return redirect("/admin")
-    # Fetch member and gym session data to populate dropdowns
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM MEMBER")
-    member_data = cursor.fetchall()
-    cursor.execute("SELECT * FROM GYM_SESSION")
-    gym_session_data = cursor.fetchall()
-    return render_template("assign_member_gym_session.html",members=member_data, gym_sessions=gym_session_data)
+    return assign_member_gym_session_service.assign_member_gym_session(conn)
+
 
 @app.route('/delete_member_gym_session', methods=["GET", "POST"])
 @admin_required
 def delete_member_gym_session():
-    if request.method == "POST":
-        gdate_time = request.form["gdate_time"]
-        
-        cursor = conn.cursor()
-        cursor.execute("DELETE FROM MEMBER_GYM_SESSION WHERE GDATE_TIME = %s", (gdate_time,))
-        conn.commit()
-        return redirect("/admin")
-    
-    cursor = conn.cursor()
-    cursor.execute("SELECT GMID, GDATE_TIME FROM MEMBER_GYM_SESSION")
-    gym_sessions = cursor.fetchall()
-    
-    return render_template("delete_member_gym_session.html", gym_sessions=gym_sessions)
+    return delete_member_gym_session_service.delete_member_gym_session(conn)
+
+
+# Member Gym Session Service End #
+# Class Service Start #
+
 
 @app.route('/create_class', methods=["GET", "POST"])
 @admin_required
 def create_class():
-    if request.method == "POST":
-        cname = request.form["cname"]
-        max_cap = request.form["max_cap"]
-        description = request.form["description"]
-        
-        cursor = conn.cursor()
-        cursor.execute("""INSERT INTO CLASS (CNAME, MAX_CAP, DESCRIPTION)
-                        VALUES (%s, %s, %s)""",
-                       (cname, max_cap, description))
-        conn.commit()
-        return redirect("/admin")
-    return render_template("create_class.html")
+    return create_class_service.create_class(conn)
+
 
 @app.route('/update_class', methods=["GET", "POST"])
 @admin_required
-def update_class_details():
-    if request.method == "POST":
-        # Get the form data
-        cid = request.form["cid"]
-        max_cap = request.form["max_cap"]
-        description = request.form["description"]
-        
-        # Construct the UPDATE query based on provided form data
-        update_query = "UPDATE CLASS SET"
-        update_values = []
-
-        if max_cap:
-            update_query += " MAX_CAP = %s,"
-            update_values.append(max_cap)
-
-        if description:
-            update_query += " DESCRIPTION = %s,"
-            update_values.append(description)
-            
-        # Fetch class data from the database
-        cursor = conn.cursor()
-        cursor.execute("SELECT CID, CNAME FROM CLASS")
-        classes = cursor.fetchall()
-
-        # If no fields are provided for update, return an error
-        if not update_values:
-            return render_template("update_class.html", classes=classes, error="At least one field must be provided for the update to occur")
-
-        # Remove the trailing comma and space from the query
-        update_query = update_query.rstrip(",") + " WHERE CID = %s"
-        update_values.append(cid)
-
-        # Execute the UPDATE query
-        cursor = conn.cursor()
-        cursor.execute(update_query, update_values)
-        conn.commit()
-        
-        # Redirect to a confirmation page or back to the admin panel
-        return redirect("/admin")
-    
-    # Fetch class data from the database
-    cursor = conn.cursor()
-    cursor.execute("SELECT CID, CNAME FROM CLASS")
-    classes = cursor.fetchall()
-    
-    # Render the form for updating class details and pass class data to the template
-    return render_template("update_class.html", classes=classes)
+def update_class():
+    return update_class_service.update_class(conn)
 
 
 @app.route('/delete_class', methods=["GET", "POST"])
 @admin_required
 def delete_class():
-    if request.method == "POST":
-        cid = request.form["cid"]
+    return delete_class_service.delete_class(conn)
 
-        cursor = conn.cursor()
-        cursor.execute("DELETE FROM CLASS WHERE CID = %s", (cid,))
-        conn.commit()
-        return redirect("/admin")
 
-    cursor = conn.cursor()
-    cursor.execute("SELECT CID, CNAME FROM CLASS")
-    classes = cursor.fetchall()
-
-    return render_template("delete_class.html", classes=classes)
+# Class Service End #
+# Equipment Service Start #
 
 
 @app.route('/create_equipment', methods=["GET", "POST"])
 @admin_required
 def create_equipment():
-    if request.method == "POST":
-        name = request.form["name"]
-        purchase_date = request.form["purchase_date"]
-        condition = request.form["condition"]
-        
-        cursor = conn.cursor()
-        cursor.execute("""INSERT INTO EQUIPMENT (NAME, PURCHASE_DATE, CONDITION)
-                        VALUES (%s, %s, %s)""",
-                       (name, purchase_date, condition))
-        conn.commit()
-        return redirect("/admin")
-    return render_template("create_equipment.html")
+    return create_equipment_service.create_equipment(conn)
+
+
+@app.route('/update_equipment', methods=["GET", "POST"])
+@admin_required
+def update_equipment():
+    return update_equipment_service.update_equipment(conn)
+
 
 @app.route('/delete_equipment', methods=["GET", "POST"])
 @admin_required
 def delete_equipment():
-    if request.method == "POST":
-        eid = request.form["eid"]
+    return delete_equipment_service.delete_equipment(conn)
 
-        cursor = conn.cursor()
-        cursor.execute("DELETE FROM EQUIPMENT WHERE EID = %s", (eid,))
-        conn.commit()
-        return redirect("/admin")
 
-    cursor = conn.cursor()
-    cursor.execute("SELECT EID, NAME FROM EQUIPMENT")
-    equipments = cursor.fetchall()
-
-    return render_template("delete_equipment.html", equipments=equipments)
+# Equipment Service End #
+# Class Equipment Service Start #
 
 
 @app.route('/assign_class_equipment', methods=["GET", "POST"])
 @admin_required
 def assign_class_equipment():
-    if request.method == "POST":
-        ueid = request.form["ueid"]
-        ucid = request.form["ucid"]
-        
-        cursor = conn.cursor()
-        cursor.execute("""INSERT INTO CLASS_EQUIPMENT (UEID, UCID)
-                        VALUES (%s, %s)""",
-                       (ueid, ucid))
-        conn.commit()
-        return redirect("/admin")
-    # Fetch equipment and class data to populate dropdowns
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM EQUIPMENT")
-    equipment_data = cursor.fetchall()
-    cursor.execute("SELECT * FROM CLASS")
-    class_data = cursor.fetchall()
-    return render_template("assign_class_equipment.html", equipment=equipment_data, classes=class_data)
-
-@app.route('/update_equipment', methods=["GET", "POST"])
-@admin_required
-def update_equipment():
-    if request.method == "POST":
-        # Get the form data
-        eid = request.form["eid"]
-        condition = request.form["condition"]
-        
-        # Construct the UPDATE query based on the provided form data
-        update_query = "UPDATE EQUIPMENT SET"
-        update_values = []
-
-        if condition:
-            update_query += " CONDITION = %s,"
-            update_values.append(condition)
-
-        # If no fields are provided for update, return an error
-        if not update_values:
-            # Fetch equipment data from the database
-            cursor = conn.cursor()
-            cursor.execute("SELECT EID, NAME FROM EQUIPMENT")
-            equipment = cursor.fetchall()
-            return render_template("update_equipment.html", equipment=equipment, error="At least one field must be provided for update")
-
-        # Remove the trailing comma and space from the query
-        update_query = update_query.rstrip(",") + " WHERE EID = %s"
-        update_values.append(eid)
-
-        # Execute the UPDATE query
-        cursor = conn.cursor()
-        cursor.execute(update_query, update_values)
-        conn.commit()
-        
-        # Redirect to a confirmation page or back to the admin panel
-        return redirect("/admin")
-    
-    # Fetch equipment data from the database
-    cursor = conn.cursor()
-    cursor.execute("SELECT EID, NAME FROM EQUIPMENT")
-    equipment = cursor.fetchall()
-    
-    # Render the form for updating equipment details and pass equipment data to the template
-    return render_template("update_equipment.html", equipment=equipment)
+    return assign_class_equipment_service.assign_class_equipment(conn)
 
 
 @app.route('/delete_class_equipment', methods=["GET", "POST"])
 @admin_required
 def delete_class_equipment():
-    if request.method == "POST":
-        ceid = request.form["ceid"]
+    return delete_class_equipment_service.delete_class_equipment(conn)
 
-        cursor = conn.cursor()
-        cursor.execute("DELETE FROM CLASS_EQUIPMENT WHERE UEID = %s", (ceid,))
-        conn.commit()
-        return redirect("/admin")
 
-    # Fetch class equipment data to populate dropdown
-    cursor = conn.cursor()
-    cursor.execute("SELECT UEID, UCID FROM CLASS_EQUIPMENT")
-    class_equipment_data = cursor.fetchall()
-
-    return render_template("delete_class_equipment.html", class_equipment=class_equipment_data)
+# Class Equipment Service End #
+# Staff Service Start #
 
 
 @app.route('/create_staff', methods=["GET", "POST"])
 @admin_required
 def create_staff():
-    if request.method == "POST":
-        fname = request.form["fname"]
-        lname = request.form["lname"]
-        gender = request.form["gender"]
-        dob = request.form["dob"]
-        email = request.form["email"]
-        password = request.form["password"]
-        contact = request.form["contact"]
-        salary = request.form["salary"]
-        position = request.form["position"]
-        employment_date = request.form["employment_date"]
-        
-        cursor = conn.cursor()
-        cursor.execute("""INSERT INTO STAFF (FNAME, LNAME, GENDER, DOB, EMAIL, PASS, CONTACT, SALARY, POSITION, EMPLOYMENTDATE)
-                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
-                       (fname, lname, gender, dob, email, password, contact, salary, position, employment_date))
-        conn.commit()
-        return redirect("/admin")
-    return render_template("create_staff.html")
+    return create_staff_service.create_staff(conn)
+
 
 @app.route('/update_staff', methods=["GET", "POST"])
 @admin_required
 def update_staff():
-    if request.method == "POST":
-        # Get the form data
-        sid = request.form["sid"]
-        contact = request.form["contact"]
-        salary = request.form["salary"]
-        position = request.form["position"]
-        
-        # Construct the UPDATE query based on provided form data
-        update_query = "UPDATE STAFF SET"
-        update_values = []
-
-        if contact:
-            update_query += " CONTACT = %s,"
-            update_values.append(contact)
-
-        if salary:
-            update_query += " SALARY = %s,"
-            update_values.append(salary)
-
-        if position:
-            update_query += " POSITION = %s,"
-            update_values.append(position)
-            
-        # If no fields are provided for update, return an error
-        if not update_values:
-            # Fetch staff data from the database
-            cursor = conn.cursor()
-            cursor.execute("SELECT SID, FNAME, LNAME FROM STAFF")
-            staff = cursor.fetchall()
-            return render_template("update_staff.html", staff=staff, error="At least one field must be provided for update")
-
-        # Remove the trailing comma and space from the query
-        update_query = update_query.rstrip(",") + " WHERE SID = %s"
-        update_values.append(sid)
-
-        # Execute the UPDATE query
-        cursor = conn.cursor()
-        cursor.execute(update_query, update_values)
-        conn.commit()
-        
-        # Redirect to a confirmation page or back to the admin panel
-        return redirect("/admin")
-    
-    # Fetch staff data from the database
-    cursor = conn.cursor()
-    cursor.execute("SELECT SID, FNAME, LNAME FROM STAFF")
-    staff = cursor.fetchall()
-    
-    # Render the form for updating staff details and pass staff data to the template
-    return render_template("update_staff.html", staff=staff)
+    return update_staff_service.update_staff(conn)
 
 
 @app.route('/delete_staff', methods=["GET", "POST"])
 @admin_required
 def delete_staff():
-    if request.method == "POST":
-        sid = request.form["sid"]
+    return delete_staff_service.delete_staff(conn)
 
-        cursor = conn.cursor()
-        cursor.execute("DELETE FROM STAFF WHERE SID = %s", (sid,))
-        conn.commit()
-        return redirect("/admin")
 
-    # Fetch staff data to populate dropdown
-    cursor = conn.cursor()
-    cursor.execute("SELECT SID, FNAME, LNAME FROM STAFF")
-    staff_data = cursor.fetchall()
-
-    return render_template("delete_staff.html", staff=staff_data)
+# Staff Service End #
+# Logs Service Start #
 
 
 @app.route('/assign_logs', methods=["GET", "POST"])
 def assign_logs():
-    if request.method == "POST":
-        leid = request.form["leid"]
-        lsid = request.form["lsid"]
-        ldate = request.form["ldate"]
-        details = request.form["details"]
-        cost = request.form["cost"]
-        
-        cursor = conn.cursor()
-        cursor.execute("""INSERT INTO LOGS (LEID, LSID, LDATE, DETAILS, COST)
-                          VALUES (%s, %s, %s, %s, %s)""",
-                       (leid, lsid, ldate, details, cost))
-        conn.commit()
-        return redirect("/admin")
-    # Fetch equipment and staff data to populate dropdowns
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM EQUIPMENT")
-    equipment_data = cursor.fetchall()
-    cursor.execute("SELECT * FROM STAFF")
-    staff_data = cursor.fetchall()
-    return render_template("assign_logs.html", equipment=equipment_data, staff=staff_data)
+    return assign_logs_service.assign_logs(conn)
+
 
 @app.route('/delete_logs', methods=["GET", "POST"])
 @admin_required
 def delete_logs():
-    if request.method == "POST":
-        lid = request.form["lid"]
+    return delete_logs_service.delete_logs(conn)
 
-        cursor = conn.cursor()
-        cursor.execute("DELETE FROM LOGS WHERE LID = %s", (lid,))
-        conn.commit()
-        return redirect("/admin")
 
-    # Fetch logs data to populate dropdown
-    cursor = conn.cursor()
-    cursor.execute("SELECT LID, LEID, LSID, LDATE, Details FROM LOGS")
-    logs_data = cursor.fetchall()
-
-    return render_template("delete_logs.html", logs=logs_data)
+# Logs Service End #
+# Session Service Start #
 
 
 @app.route('/assign_session', methods=["GET", "POST"])
 def assign_session():
-    if request.method == "POST":
-        scid = request.form["scid"]
-        ssid = request.form["ssid"]
-        sdate = request.form["sdate"]
-        
-        cursor = conn.cursor()
-        cursor.execute("""INSERT INTO SESSION (SCID, SSID, SDATE)
-                          VALUES (%s, %s, %s)""",
-                       (scid, ssid, sdate))
-        conn.commit()
-        return redirect("/admin")
-    # Fetch equipment and staff data to populate dropdowns
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM CLASS")
-    class_data = cursor.fetchall()
-    cursor.execute("SELECT * FROM STAFF")
-    staff_data = cursor.fetchall()
-    return render_template("assign_session.html", classes=class_data, staff=staff_data)
+    return assign_session_service.assign_session(conn)
+
 
 @app.route('/delete_session', methods=["GET", "POST"])
 @admin_required
 def delete_session():
-    if request.method == "POST":
-        scid = request.form["scid"]
-        ssid = request.form["ssid"]
-        sdate = request.form["sdate"]
+    return delete_session_service.delete_session(conn)
 
-        cursor = conn.cursor()
-        cursor.execute("DELETE FROM SESSION WHERE SCID = %s AND SSID = %s AND SDATE = %s", (scid, ssid, sdate))
-        conn.commit()
-        return redirect("/admin")
 
-    # Fetch session data to populate dropdown
-    cursor = conn.cursor()
-    cursor.execute("SELECT SCID, SSID, SDATE FROM SESSION")
-    session_data = cursor.fetchall()
-
-    return render_template("delete_session.html", sessions=session_data)
+# Session Service End #
+# Registered Service Start #
 
 
 @app.route('/assign_registered', methods=["GET", "POST"])
 def assign_registered():
-    if request.method == "POST":
-        regmid = request.form["regmid"]
-        regsid = request.form["regsid"]
-        regcid = request.form["regcid"]
-        regdate = request.form["regdate"]
-        
-        cursor = conn.cursor()
-        cursor.execute("""INSERT INTO REGISTERED (REGMID, REGSID, REGCID, REGDATE)
-                          VALUES (%s, %s, %s, %s)""",
-                       (regmid, regsid, regcid, regdate))
-        conn.commit()
-        return redirect("/admin")
-    # Fetch equipment and staff data to populate dropdowns
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM MEMBER")
-    member_data = cursor.fetchall()
-    cursor.execute("SELECT * FROM SESSION")
-    session_data = cursor.fetchall()
-    return render_template("assign_registered.html", members=member_data, sessions=session_data)
+    return assign_registered_service.assign_registered(conn)
+
 
 @app.route('/delete_registered', methods=["GET", "POST"])
 @admin_required
 def delete_registered():
-    if request.method == "POST":
-        regmid = request.form["regmid"]
-        regsid = request.form["regsid"]
-        regcid = request.form["regcid"]
-        regdate = request.form["regdate"]
+    return delete_registered_service.delete_registered(conn)
 
-        cursor = conn.cursor()
-        cursor.execute("DELETE FROM REGISTERED WHERE REGMID = %s AND REGSID = %s AND REGCID = %s AND REGDATE = %s", (regmid, regsid, regcid, regdate))
-        conn.commit()
-        return redirect("/admin")
 
-    # Fetch registered data to populate dropdown
-    cursor = conn.cursor()
-    cursor.execute("SELECT REGMID, REGSID, REGCID, REGDATE FROM REGISTERED")
-    registered_data = cursor.fetchall()
-
-    return render_template("delete_registered.html", registered=registered_data)
+# Registered Service End #
 
 
 if __name__ == '__main__':
