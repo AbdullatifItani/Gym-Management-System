@@ -13,38 +13,68 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh; /* Adjusted minimum height */
-            overflow-y: auto; /* Added overflow for vertical scrolling */
+            min-height: 100vh;
+            overflow-y: auto;
         }
         .container {
             background-color: #fff;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            width: 600px;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 800px;
             margin: 20px;
         }
         h1 {
             text-align: center;
             color: #333;
+            margin-bottom: 30px;
         }
         h2 {
-            margin-top: 20px;
-            color: #666;
+            margin-top: 30px;
+            color: #555;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: color 0.3s ease, background-color 0.3s ease;
+            padding: 10px 15px;
+            border-radius: 5px;
+            background-color: #f0f0f0;
+        }
+        h2:hover {
+            background-color: #e0e0e0;
+            color: #333;
+        }
+        h2.active {
+            background-color: #ccc;
+            color: #333;
         }
         a {
             display: block;
             text-decoration: none;
-            color: #333;
+            color: #555;
             margin-top: 10px;
-            padding: 10px;
-            background-color: #f0f0f0;
+            padding: 12px 15px;
+            background-color: #f7f7f7;
             border-radius: 5px;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
         a:hover {
-            background-color: #ccc;
-            color: #000;
+            background-color: #e0e0e0;
+            color: #333;
+        }
+        .hidden {
+            display: none;
+        }
+        .arrow {
+            content: '▶';
+        }
+        .arrow::after {
+            content: '▼'; /* Arrow facing rightward */
+            margin-left: 10px;
+        }
+        .arrow.collapsed::after {
+            content: '▶'; /* Arrow facing downward when pressed */
         }
     </style>
 </head>
@@ -53,82 +83,125 @@
 <div class="container">
     <h1>Admin Panel</h1>
     <div>
-        <h2>Manage Members</h2>
-        <a href="/create_member">Create Member</a>
-        <a href="/update_member_contact">Update Member Contact</a>
-        <a href="/delete_member">Delete Member</a> 
+        <h2 class="arrow" onclick="toggleVisibility('members', this)">Manage Members</h2>
+        <div id="members" class="hidden">
+            <a href="/create_member">Create Member</a>
+            <a href="/update_member_contact">Update Member Contact</a>
+            <a href="/delete_member">Delete Member</a>
+        </div>
     </div>
     <div>
-        <h2>Manage Emergency Contacts</h2>
-        <a href="/assign_emergency_contact">Assign Emergency Contact</a>
-        <a href="/update_emergency_contact">Update Emergency Contact</a> 
-        <a href="/delete_emergency_contact">Delete Emergency Contact</a> 
+        <h2 class="arrow" onclick="toggleVisibility('emergencyContacts', this)">Manage Emergency Contacts</h2>
+        <div id="emergencyContacts" class="hidden">
+            <a href="/assign_emergency_contact">Assign Emergency Contact</a>
+            <a href="/update_emergency_contact">Update Emergency Contact</a>
+            <a href="/delete_emergency_contact">Delete Emergency Contact</a>
+        </div>
     </div>
     <div>
-        <h2>Manage Packages</h2>
-        <a href="/create_package">Create Package</a>
-        <a href="/update_package">Update Package</a> 
-        <a href="/delete_package">Delete Package</a> 
+        <h2 class="arrow" onclick="toggleVisibility('packages', this)">Manage Packages</h2>
+        <div id="packages" class="hidden">
+            <a href="/create_package">Create Package</a>
+            <a href="/update_package">Update Package</a>
+            <a href="/delete_package">Delete Package</a>
+        </div>
     </div>
     <div>
-        <h2>Manage Member Packages</h2>
-        <a href="/assign_member_package">Assign Member Package</a>
-        <a href="/delete_member_package">Delete Member Package</a>
+        <h2 class="arrow" onclick="toggleVisibility('memberPackages', this)">Manage Member Packages</h2>
+        <div id="memberPackages" class="hidden">
+            <a href="/assign_member_package">Assign Member Package</a>
+            <a href="/delete_member_package">Delete Member Package</a>
+        </div>
     </div>
     <div>
-        <h2>Manage Reviews</h2>
-        <a href="/create_review">Create Review</a>
-        <a href="/delete_review">Delete Review</a> 
+        <h2 class="arrow" onclick="toggleVisibility('reviews', this)">Manage Reviews</h2>
+        <div id="reviews" class="hidden">
+            <a href="/create_review">Create Review</a>
+            <a href="/delete_review">Delete Review</a>
+        </div>
     </div>
     <div>
-        <h2>Manage Gym Sessions</h2>
-        <a href="/create_gym_session">Create Gym Session</a>
-        <a href="/delete_gym_session">Delete Gym Session</a>
+        <h2 class="arrow" onclick="toggleVisibility('gymSessions', this)">Manage Gym Sessions</h2>
+        <div id="gymSessions" class="hidden">
+            <a href="/create_gym_session">Create Gym Session</a>
+            <a href="/delete_gym_session">Delete Gym Session</a>
+        </div>
     </div>
     <div>
-        <h2>Manage Member Gym Sessions</h2>
-        <a href="/assign_member_gym_session">Assign Member Gym Session</a>
-        <a href="/delete_member_gym_session">Delete Member Gym Session</a>
+        <h2 class="arrow" onclick="toggleVisibility('memberGymSessions', this)">Manage Member Gym Sessions</h2>
+        <div id="memberGymSessions" class="hidden">
+            <a href="/assign_member_gym_session">Assign Member Gym Session</a>
+            <a href="/delete_member_gym_session">Delete Member Gym Session</a>
+        </div>
     </div>
     <div>
-        <h2>Manage Classes</h2>
-        <a href="/create_class">Create Class</a>
-        <a href="/update_class">Update Class</a>
-        <a href="/delete_class">Delete Class</a>
+        <h2 class="arrow" onclick="toggleVisibility('classes', this)">Manage Classes</h2>
+        <div id="classes" class="hidden">
+            <a href="/create_class">Create Class</a>
+            <a href="/update_class">Update Class</a>
+            <a href="/delete_class">Delete Class</a>
+        </div>
     </div>
     <div>
-        <h2>Manage Equipment</h2>
-        <a href="/create_equipment">Create Equipment</a>
-        <a href="/update_equipment">Update Equipment</a>
-        <a href="/delete_equipment">Delete Equipment</a>
+        <h2 class="arrow" onclick="toggleVisibility('equipment', this)">Manage Equipment</h2>
+        <div id="equipment" class="hidden">
+            <a href="/create_equipment">Create Equipment</a>
+            <a href="/update_equipment">Update Equipment</a>
+            <a href="/delete_equipment">Delete Equipment</a>
+        </div>
     </div>
     <div>
-        <h2>Manage Class Equipment</h2>
-        <a href="/assign_class_equipment">Assign Class Equipment</a>
-        <a href="/delete_class_equipment">Delete Class Equipment</a>
+        <h2 class="arrow" onclick="toggleVisibility('classEquipment', this)">Manage Class Equipment</h2>
+        <div id="classEquipment" class="hidden">
+            <a href="/assign_class_equipment">Assign Class Equipment</a>
+            <a href="/delete_class_equipment">Delete Class Equipment</a>
+        </div>
     </div>
     <div>
-        <h2>Manage Staff</h2>
-        <a href="/create_staff">Create Staff</a>
-        <a href="/update_staff">Update Staff</a>
-        <a href="/delete_staff">Delete Staff</a>
+        <h2 class="arrow" onclick="toggleVisibility('staff', this)">Manage Staff</h2>
+        <div id="staff" class="hidden">
+            <a href="/create_staff">Create Staff</a>
+            <a href="/update_staff">Update Staff</a>
+            <a href="/delete_staff">Delete Staff</a>
+        </div>
     </div>
     <div>
-        <h2>Manage Logs</h2>
-        <a href="/assign_logs">Assign Logs</a>
-        <a href="/delete_logs">Delete Logs</a>
+        <h2 class="arrow" onclick="toggleVisibility('logs', this)">Manage Logs</h2>
+        <div id="logs" class="hidden">
+            <a href="/assign_logs">Assign Logs</a>
+            <a href="/delete_logs">Delete Logs</a>
+        </div>
     </div>
     <div>
-        <h2>Manage Sessions</h2>
-        <a href="/assign_session">Assign Session</a>
-        <a href="/delete_session">Delete Session</a>
+        <h2 class="arrow" onclick="toggleVisibility('sessions', this)">Manage Sessions</h2>
+        <div id="sessions" class="hidden">
+            <a href="/assign_session">Assign Session</a>
+            <a href="/delete_session">Delete Session</a>
+        </div>
     </div>
     <div>
-        <h2>Manage Registered</h2>
-        <a href="/assign_registered">Assign Registered</a>
-        <a href="/delete_registered">Delete Registered</a>
+        <h2 class="arrow" onclick="toggleVisibility('registered', this)">Manage Registered</h2>
+        <div id="registered" class="hidden">
+            <a href="/assign_registered">Assign Registered</a>
+            <a href="/delete_registered">Delete Registered</a>
+        </div>
     </div>
 </div>
+
+<script>
+    function toggleVisibility(id, element) {
+        const content = document.getElementById(id);
+        if (content.style.display === 'none' || content.style.display === '') {
+            content.style.display = 'block';
+            element.classList.remove('collapsed');
+            element.classList.add('active');
+        } else {
+            content.style.display = 'none';
+            element.classList.remove('active');
+            element.classList.add('collapsed');
+        }
+    }
+</script>
 
 </body>
 </html>

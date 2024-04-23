@@ -2,7 +2,7 @@ from flask import request, render_template, session, redirect
 from EECE433Project.helper_functions import create_token
 
 
-def login(conn):
+def login(conn, bcrypt):
     if request.method == "POST":
         email = request.form["email"]
         password = request.form["password"]
@@ -15,7 +15,7 @@ def login(conn):
         data = cursor.fetchone()
         if data is None:
             return render_template("login.html", error="Incorrect Login Information")
-        if data[1] == password:
+        if bcrypt.check_password_hash(data[1], password):
             if email == "admin@gmail.com" and staff:
                 session['admin'] = True
             if staff:
