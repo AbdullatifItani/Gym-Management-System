@@ -1,10 +1,10 @@
 from flask import Flask, render_template, session, redirect
-from flask_bcrypt import Bcrypt
+# from flask_bcrypt import Bcrypt
 import psycopg2
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
-bcrypt = Bcrypt(app)
+# bcrypt = Bcrypt(app)
 
 from .db_config import DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT
 
@@ -66,12 +66,12 @@ def admin():
 
 @app.route('/register', methods=["GET", "POST"])
 def register():
-    return register_service.register(conn, bcrypt)
+    return register_service.register(conn)
 
 
 @app.route('/login', methods=["GET", "POST"])
 def login():
-    return login_service.login(conn, bcrypt)
+    return login_service.login(conn)
 
 
 @app.route('/logout')
