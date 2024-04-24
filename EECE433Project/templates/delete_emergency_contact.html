@@ -21,15 +21,20 @@
             padding: 20px;
             border-radius: 5px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            width: 300px;
+            width: 500px;
         }
-        select {
+        table {
             width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
             border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
         }
         input[type="submit"] {
             background-color: #ff4444;
@@ -48,13 +53,29 @@
 
 <div class="container">
     <h2>Delete Emergency Contact</h2>
-    <form action="/delete_emergency_contact" method="POST">
-        <label for="emid">Select Emergency Contact:</label>
-        <select id="emid" name="emid" required>
-            {% for contact in contacts %}
-            <option value="{{ contact[0] }}">{{ contact[0] }} - {{ contact[1] }} - {{ contact[2] }}</option>
-            {% endfor %}
-        </select><br>
+    <form method="POST">
+        <table>
+            <thead>
+                <tr>
+                    <th>Select</th>
+                    <th>Member ID</th>
+                    <th>Name</th>
+                    <th>Contact</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for contact in contacts %}
+                    <tr>
+                        <td>
+                            <input type="radio" name="emid_name" value="{{ contact[0] }}|{{ contact[1] }}" required>
+                        </td>
+                        <td>{{ contact[0] }}</td>
+                        <td>{{ contact[1] }}</td>
+                        <td>{{ contact[2] }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
         <input type="submit" value="Delete Emergency Contact">
     </form>
 </div>

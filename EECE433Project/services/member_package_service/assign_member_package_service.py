@@ -5,13 +5,20 @@ def assign_member_package(conn):
     if request.method == "POST":
         ppid = request.form["ppid"]
         pmid = request.form["pmid"]
-        start_date = request.form["start_date"]
-        end_date = request.form["end_date"]
 
         cursor = conn.cursor()
-        cursor.execute("""INSERT INTO MEMBER_PACKAGE (PPID, PMID, START_DATE, END_DATE)
-                        VALUES (%s, %s, %s, %s)""",
-                       (ppid, pmid, start_date, end_date))
+        cursor.execute("""SELECT * FROM MEMBER_PACKAGE
+                    WHERE PMID = %s AND END_DATE >= CURRENT_DATE""",
+                       (pmid,))
+
+        existing_package = cursor.fetchone()
+
+        if existing_package:
+            return "Member already has an active package."
+
+        cursor.execute("""INSERT INTO MEMBER_PACKAGE (PPID, PMID)
+                        VALUES (%s, %s)""",
+                       (ppid, pmid))
         conn.commit()
         return redirect("/admin")
     # Fetch member and package data to populate dropdowns

@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Assign Member Package</title>
     <style>
-        /* Add your CSS styles here */
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
@@ -21,7 +20,20 @@
             padding: 20px;
             border-radius: 5px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            width: 300px;
+            width: 1200px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
         }
         input[type="number"],
         input[type="date"],
@@ -50,22 +62,66 @@
 <div class="container">
     <h2>Assign Member Package</h2>
     <form action="/assign_member_package" method="POST">
-        <label for="ppid">Package ID:</label>
-        <select id="ppid" name="ppid" required>
-            {% for ppid in packages %}
-            <option value="{{ ppid[0] }}">{{ ppid[0] }} - {{ ppid[1] }} - {{ ppid[2] }}</option>
-            {% endfor %}
-        </select><br>
-        <label for="pmid">Member ID:</label>
-        <select id="pmid" name="pmid" required>
-            {% for pmid in members %}
-            <option value="{{ pmid[0] }}">{{ pmid[0] }} - {{ pmid[1] }} {{ pmid[2] }}</option>
-            {% endfor %}
-        </select><br>
-        <label for="start_date">Start Date:</label>
-        <input type="date" id="start_date" name="start_date" required><br>
-        <label for="end_date">End Date:</label>
-        <input type="date" id="end_date" name="end_date" required><br>
+        <h3>Select Member:</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Select</th>
+                    <th>Member ID</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Gender</th>
+                    <th>Date of Birth</th>
+                    <th>Email</th>
+                    <th>Contact</th>
+                    <th>Joining Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for member in members %}
+                    <tr>
+                        <td>
+                            <input type="radio" name="pmid" value="{{ member[0] }}" required>
+                        </td>
+                        <td>{{ member[0] }}</td>
+                        <td>{{ member[1] }}</td>
+                        <td>{{ member[2] }}</td>
+                        <td>{{ member[3] }}</td>
+                        <td>{{ member[4] }}</td>
+                        <td>{{ member[5] }}</td>
+                        <td>{{ member[7] }}</td>
+                        <td>{{ member[8] }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <h3>Select Package:</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Select</th>
+                    <th>Package ID</th>
+                    <th>Package Name</th>
+                    <th>Description</th>
+                    <th>Price</th>
+                    <th>Duration</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for package in packages %}
+                <tr>
+                    <td>
+                        <input type="radio" name="ppid" value="{{ package[0] }}" required>
+                    </td>
+                    <td>{{ package[0] }}</td>
+                    <td>{{ package[1] }}</td>
+                    <td>{{ package[2] }}</td>
+                    <td>{{ package[3] }}</td>
+                    <td>{{ package[4] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
         <input type="submit" value="Assign Member Package">
     </form>
 </div>

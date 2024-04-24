@@ -80,7 +80,7 @@
     <h1>Package Members</h1>
     <form action="/display_package_members" method="GET">
         <label for="package_id">Select Package:</label>
-        <select id="package_id" name="package_id">
+        <select id="package_id" name="package_id" required>
             <option value="">Select Package</option>
             {% for package in packages %}
                 <option value="{{ package[0] }}">{{ package[1] }}</option>

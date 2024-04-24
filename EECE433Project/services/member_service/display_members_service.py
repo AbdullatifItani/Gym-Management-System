@@ -1,5 +1,6 @@
 from flask import render_template
 
+
 def display_members(conn):
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM MEMBER")

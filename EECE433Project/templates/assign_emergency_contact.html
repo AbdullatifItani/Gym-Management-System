@@ -16,60 +16,49 @@
             min-height: 100vh;
             overflow-y: auto;
         }
-        
         .container {
             background-color: #fff;
             padding: 20px;
             border-radius: 5px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            width: 600px;
+            width: 1100px;
             margin: 20px;
         }
-        
-        h1 {
-            text-align: center;
-            color: #333;
-        }
-        
-        form {
-            margin-bottom: 20px;
-        }
-        
         label {
-            margin-right: 10px;
+            margin-bottom: 8px;
+            display: block;
         }
-        
-        select {
-            padding: 8px;
-            font-size: 16px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
-        
-        button {
-            padding: 8px 16px;
-            font-size: 16px;
-            border-radius: 5px;
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            cursor: pointer;
-        }
-        
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            margin-bottom: 20px;
         }
-        
         th, td {
-            padding: 8px;
+            border: 1px solid #ccc;
+            padding: 10px;
             text-align: left;
-            border-bottom: 1px solid #ddd;
         }
-        
         th {
             background-color: #f2f2f2;
+        }
+        input[type="text"] {
+            width: 40%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        input[type="submit"] {
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        input[type="submit"]:hover {
+            background-color: #45a049;
         }
     </style>
 </head>
@@ -78,16 +67,46 @@
 <div class="container">
     <h2>Assign Emergency Contact</h2>
     <form action="/assign_emergency_contact" method="POST">
-        <label for="emid">Member ID:</label>
-        <select id="emid" name="emid" required>
-            {% for emid in members %}
-            <option value="{{ emid[0] }}">{{ emid[0] }} - {{ emid[1] }} {{ emid[2] }}</option>
-            {% endfor %}
-        </select><br>
+        {% if 'admin' in session %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Select</th>
+                    <th>Member ID</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Gender</th>
+                    <th>Date of Birth</th>
+                    <th>Email</th>
+                    <th>Contact</th>
+                    <th>Joining Date</th>
+                </tr>
+            </thead>
+            <tbody id="contactTableBody">
+                {% for member in members %}
+                    <tr>
+                        <td>
+                            <input type="radio" name="emid" value="{{ member[0] }}" required>
+                        </td>
+                        <td>{{ member[0] }}</td>
+                        <td>{{ member[1] }}</td>
+                        <td>{{ member[2] }}</td>
+                        <td>{{ member[3] }}</td>
+                        <td>{{ member[4] }}</td>
+                        <td>{{ member[5] }}</td>
+                        <td>{{ member[7] }}</td>
+                        <td>{{ member[8] }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <h4>Enter your emergency contact.</h4>
+        {% endif %}
         <label for="ename">Emergency Contact Name:</label>
-        <input type="text" id="ename" name="ename" required>
+        <input type="text" id="ename" name="ename" required><br>
         <label for="contact">Contact:</label>
-        <input type="text" id="contact" name="contact" required>
+        <input type="text" id="contact" name="contact" required><br>
         <input type="submit" value="Assign Emergency Contact">
     </form>
 </div>

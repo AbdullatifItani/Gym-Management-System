@@ -24,22 +24,39 @@
             width: 600px;
             margin: 20px;
         }
-        h1 {
-            text-align: center;
-            color: #333;
+        select {
+            width: 40%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
         }
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            margin-bottom: 20px;
         }
         th, td {
-            padding: 8px;
+            border: 1px solid #ccc;
+            padding: 10px;
             text-align: left;
-            border-bottom: 1px solid #ddd;
         }
         th {
             background-color: #f2f2f2;
+        }
+        button[type="submit"] {
+            background-color: #007BFF;
+            color: #fff;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        button[type="submit"]:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
@@ -47,6 +64,7 @@
 
 <div class="container">
     <h1>Emergency Contacts</h1>
+    {% if 'admin' in session %}
     <form action="/display_emergency_contacts" method="GET">
         <label for="member_id">Select Member:</label>
         <select id="member_id" name="member_id">
@@ -54,10 +72,13 @@
             {% for member in members %}
                 <option value="{{ member[0] }}">{{ member[1] }} {{ member[2] }}</option>
             {% endfor %}
-        </select>
+        </select><br>
         <button type="submit">Show Contacts</button>
+        <br><br>
     </form>
-    
+    {% else %}
+    <h4>Your emergency contacts:</h4>
+    {% endif %}
     <table>
         <thead>
             <tr>

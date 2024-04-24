@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Delete Member</title>
     <style>
-        /* Add your CSS styles here */
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
@@ -14,33 +13,44 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh; /* Adjusted minimum height */
+            overflow-y: auto; /* Added overflow for vertical scrolling */
         }
         .container {
             background-color: #fff;
             padding: 20px;
             border-radius: 5px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            width: 300px;
+            width: 1100px;
+            margin: 20px;
         }
-        select,
-        button {
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        table {
             width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-            cursor: pointer;
+            border-collapse: collapse;
+            margin-bottom: 20px;
         }
-        button {
-            background-color: #ff5252;
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        input[type="submit"] {
+            background-color: #ff4444;
             color: white;
             border: none;
+            cursor: pointer;
             border-radius: 4px;
+            padding: 10px;
         }
-        button:hover {
-            background-color: #ff1744;
+        input[type="submit"]:hover {
+            background-color: #cc0000;
         }
         p.error {
             color: #ff0000;
@@ -54,13 +64,39 @@
 <div class="container">
     <h2>Delete Member</h2>
     <form method="POST">
-        <label for="mid">Select Member to Delete:</label>
-        <select name="mid" id="mid">
-            {% for member in members %}
-                <option value="{{ member[0] }}">{{ member[1] }} {{ member[2] }}</option>
-            {% endfor %}
-        </select>
-        <button type="submit">Delete Member</button>
+        <table>
+            <thead>
+                <tr>
+                    <th>Select</th>
+                    <th>Member ID</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Gender</th>
+                    <th>Date of Birth</th>
+                    <th>Email</th>
+                    <th>Contact</th>
+                    <th>Joining Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for member in members %}
+                    <tr>
+                        <td>
+                            <input type="radio" name="emid_name" value="{{ member[0] }}" required>
+                        </td>
+                        <td>{{ member[0] }}</td>
+                        <td>{{ member[1] }}</td>
+                        <td>{{ member[2] }}</td>
+                        <td>{{ member[3] }}</td>
+                        <td>{{ member[4] }}</td>
+                        <td>{{ member[5] }}</td>
+                        <td>{{ member[7] }}</td>
+                        <td>{{ member[8] }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <input type="submit" value="Delete Member">
     </form>
     {% if error %}
         <p class="error">{{ error }}</p>

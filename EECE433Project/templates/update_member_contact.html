@@ -55,6 +55,7 @@
 <div class="container">
     <h2>Update Member Contact</h2>
     <form method="POST" id="contactForm">
+        {% if 'admin' in session %}
         <input type="hidden" name="mid" id="mid" value=""> <!-- Hidden field for mid -->
         <table>
             <thead>
@@ -66,84 +67,96 @@
                 </tr>
             </thead>
             <tbody id="contactTableBody">
-                <!-- Member data will be populated here -->
+                {% for member in members %}
+                <tr>
+                        <td>
+                            <input type="radio" name="mid_name" value="{{ member[0] }}" required>
+                        </td>
+                        <td>{{member[0]}}</td>
+                        <td>{{member[1]}} {{member[2]}}</td>
+                        <td>{{member[3]}}</td>
+                    </tr>
+                {% endfor %}
             </tbody>
         </table>
-        <div id="pagination">
-            <button type="button" id="prevBtn" disabled>Prev</button>
-            <button type="button" id="nextBtn">Next</button>
-        </div>
+        {% else %}
+        <h4>Enter your new contact information.</h4>
+        {% endif %}
+{#        <div id="pagination">#}
+{#            <button type="button" id="prevBtn" disabled>Prev</button>#}
+{#            <button type="button" id="nextBtn">Next</button>#}
+{#        </div>#}
         <label for="new_contact">New Contact Information:</label>
         <input type="text" name="new_contact" id="new_contact" required><br><br>
         <input type="submit" value="Update Contact">
     </form>
 </div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const members = JSON.parse('{{ members|tojson }}');
-        const tableBody = document.getElementById('contactTableBody');
-        const prevBtn = document.getElementById('prevBtn');
-        const nextBtn = document.getElementById('nextBtn');
-        const midField = document.getElementById('mid');
-        let currentPage = 1;
-        const itemsPerPage = 10;
-
-        function displayMembers(page) {
-            const start = (page - 1) * itemsPerPage;
-            const end = start + itemsPerPage;
-            const paginatedMembers = members.slice(start, end);
-
-            tableBody.innerHTML = ''; // Clear table body
-
-            paginatedMembers.forEach(member => {
-                const row = `
-                    <tr>
-                        <td>
-                            <input type="radio" name="mid_name" value="${member[0]}" required>
-                        </td>
-                        <td>${member[0]}</td>
-                        <td>${member[1]} ${member[2]}</td>
-                        <td>${member[3]}</td>
-                    </tr>
-                `;
-                tableBody.innerHTML += row;
-            });
-
-            // Check if there are more members to display
-            if (members.length <= end) {
-                nextBtn.disabled = true;
-            } else {
-                nextBtn.disabled = false;
-            }
-        }
-
-        nextBtn.addEventListener('click', function() {
-            currentPage++;
-            displayMembers(currentPage);
-            prevBtn.disabled = false;
-        });
-
-        prevBtn.addEventListener('click', function() {
-            currentPage--;
-            displayMembers(currentPage);
-            if (currentPage === 1) {
-                prevBtn.disabled = true;
-            }
-            nextBtn.disabled = false; // Enable next button when going back
-        });
-
-        displayMembers(currentPage);
-
-        // Add event listener for radio buttons to update mid field value
-        const radioButtons = document.querySelectorAll('input[name="mid_name"]');
-        radioButtons.forEach(button => {
-            button.addEventListener('change', function() {
-                midField.value = this.value; // Update mid field value
-            });
-        });
-    });
-</script>
+{#<script>#}
+{#    document.addEventListener('DOMContentLoaded', function() {#}
+{#        const members = JSON.parse('{{ members|tojson }}');#}
+{#        const tableBody = document.getElementById('contactTableBody');#}
+{#        const prevBtn = document.getElementById('prevBtn');#}
+{#        const nextBtn = document.getElementById('nextBtn');#}
+{#        const midField = document.getElementById('mid');#}
+{#        let currentPage = 1;#}
+{#        const itemsPerPage = 10;#}
+{##}
+{#        function displayMembers(page) {#}
+{#            const start = (page - 1) * itemsPerPage;#}
+{#            const end = start + itemsPerPage;#}
+{#            const paginatedMembers = members.slice(start, end);#}
+{##}
+{#            tableBody.innerHTML = ''; // Clear table body#}
+{##}
+{#            paginatedMembers.forEach(member => {#}
+{#                const row = `#}
+{#                    <tr>#}
+{#                        <td>#}
+{#                            <input type="radio" name="mid_name" value="${member[0]}" required>#}
+{#                        </td>#}
+{#                        <td>${member[0]}</td>#}
+{#                        <td>${member[1]} ${member[2]}</td>#}
+{#                        <td>${member[3]}</td>#}
+{#                    </tr>#}
+{#                `;#}
+{#                tableBody.innerHTML += row;#}
+{#            });#}
+{##}
+{#            // Check if there are more members to display#}
+{#            if (members.length <= end) {#}
+{#                nextBtn.disabled = true;#}
+{#            } else {#}
+{#                nextBtn.disabled = false;#}
+{#            }#}
+{#        }#}
+{##}
+{#        nextBtn.addEventListener('click', function() {#}
+{#            currentPage++;#}
+{#            displayMembers(currentPage);#}
+{#            prevBtn.disabled = false;#}
+{#        });#}
+{##}
+{#        prevBtn.addEventListener('click', function() {#}
+{#            currentPage--;#}
+{#            displayMembers(currentPage);#}
+{#            if (currentPage === 1) {#}
+{#                prevBtn.disabled = true;#}
+{#            }#}
+{#            nextBtn.disabled = false; // Enable next button when going back#}
+{#        });#}
+{##}
+{#        displayMembers(currentPage);#}
+{##}
+{#        // Add event listener for radio buttons to update mid field value#}
+{#        const radioButtons = document.querySelectorAll('input[name="mid_name"]');#}
+{#        radioButtons.forEach(button => {#}
+{#            button.addEventListener('change', function() {#}
+{#                midField.value = this.value; // Update mid field value#}
+{#            });#}
+{#        });#}
+{#    });#}
+{#</script>#}
 
 </body>
 </html>

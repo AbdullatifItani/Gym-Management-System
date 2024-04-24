@@ -42,7 +42,7 @@ from EECE433Project.services.emergency_contact_service import assign_emergency_c
 from EECE433Project.services.auth_service import login_service, register_service
 from EECE433Project.services.logs_service import assign_logs_service, delete_logs_service
 from EECE433Project.services.review_service import create_review_service, delete_review_service
-from EECE433Project.helper_functions import admin_required
+from EECE433Project.helper_functions import admin_required, login_required
 
 
 @app.route('/')
@@ -96,7 +96,7 @@ def create_member():
 
 
 @app.route('/update_member_contact', methods=["GET", "POST"])
-@admin_required
+@login_required
 def update_member_contact():
     return update_member_contact_service.update_member_contact(conn)
 
@@ -106,34 +106,37 @@ def update_member_contact():
 def delete_member():
     return delete_member_service.delete_member(conn)
 
+
 @app.route('/display_members', methods=["GET"])
 @admin_required
 def display_members():
     return display_members_service.display_members(conn)
+
 
 # Member Service End #
 # Emergency Contact Service Start #
 
 
 @app.route('/assign_emergency_contact', methods=["GET", "POST"])
-@admin_required
+@login_required
 def assign_emergency_contact():
     return assign_emergency_contact_service.assign_emergency_contact(conn)
 
 
 @app.route('/update_emergency_contact', methods=["GET", "POST"])
-@admin_required
+@login_required
 def update_emergency_contact():
     return update_emergency_contact_service.update_emergency_contact(conn)
 
 
 @app.route('/delete_emergency_contact', methods=["GET", "POST"])
-@admin_required
+@login_required
 def delete_emergency_contact():
     return delete_emergency_contact_service.delete_emergency_contact(conn)
 
+
 @app.route('/display_emergency_contacts', methods=['GET'])
-@admin_required
+@login_required
 def display_emergency_contacts():
     return display_emergency_contacts_service.display_emergency_contacts(conn)
 
@@ -159,33 +162,36 @@ def update_package():
 def delete_package():
     return delete_package_service.delete_package(conn)
 
+
 @app.route('/display_packages', methods=['GET'])
-@admin_required
 def display_packages():
     return display_packages_service.display_packages(conn)
+
 
 # Package Service End #
 # Member Package Service Start #
 
 
 @app.route('/assign_member_package', methods=["GET", "POST"])
-@admin_required
+@login_required
 def assign_member_package():
     return assign_member_package_service.assign_member_package(conn)
 
 
 @app.route('/delete_member_package', methods=["GET", "POST"])
-@admin_required
+@login_required
 def delete_member_package():
     return delete_member_package_service.delete_member_package(conn)
+
 
 @app.route('/display_package_members', methods=['GET'])
 @admin_required
 def display_package_members():
     return display_package_members_service.display_package_members(conn)
 
+
 @app.route('/display_member_packages', methods=['GET'])
-@admin_required
+@login_required
 def display_member_packages():
     return display_member_packages_service.display_member_packages(conn)
 
@@ -195,13 +201,13 @@ def display_member_packages():
 
 
 @app.route('/create_review', methods=["GET", "POST"])
-@admin_required
+@login_required
 def create_review():
     return create_review_service.create_review(conn)
 
 
 @app.route('/delete_review', methods=["GET", "POST"])
-@admin_required
+@login_required
 def delete_review():
     return delete_review_service.delete_review(conn)
 
@@ -221,8 +227,8 @@ def create_gym_session():
 def delete_gym_session():
     return delete_gym_session_service.delete_gym_session(conn)
 
+
 @app.route('/display_gym_sessions', methods=['GET'])
-@admin_required
 def display_gym_sessions():
     return display_gym_sessions_service.display_gym_sessions(conn)
 
@@ -232,13 +238,13 @@ def display_gym_sessions():
 
 
 @app.route('/assign_member_gym_session', methods=["GET", "POST"])
-@admin_required
+@login_required
 def assign_member_gym_session():
     return assign_member_gym_session_service.assign_member_gym_session(conn)
 
 
 @app.route('/delete_member_gym_session', methods=["GET", "POST"])
-@admin_required
+@login_required
 def delete_member_gym_session():
     return delete_member_gym_session_service.delete_member_gym_session(conn)
 
@@ -264,8 +270,8 @@ def update_class():
 def delete_class():
     return delete_class_service.delete_class(conn)
 
+
 @app.route('/display_classes', methods=['GET'])
-@admin_required
 def display_classes():
     return display_classes_service.display_classes(conn)
 
@@ -290,6 +296,7 @@ def update_equipment():
 @admin_required
 def delete_equipment():
     return delete_equipment_service.delete_equipment(conn)
+
 
 @app.route('/display_equipment', methods=['GET'])
 @admin_required
@@ -334,6 +341,7 @@ def update_staff():
 def delete_staff():
     return delete_staff_service.delete_staff(conn)
 
+
 @app.route('/display_staff', methods=['GET'])
 @admin_required
 def display_staff():
@@ -345,6 +353,7 @@ def display_staff():
 
 
 @app.route('/assign_logs', methods=["GET", "POST"])
+@admin_required
 def assign_logs():
     return assign_logs_service.assign_logs(conn)
 
@@ -360,6 +369,7 @@ def delete_logs():
 
 
 @app.route('/assign_session', methods=["GET", "POST"])
+@login_required
 def assign_session():
     return assign_session_service.assign_session(conn)
 
@@ -375,6 +385,7 @@ def delete_session():
 
 
 @app.route('/assign_registered', methods=["GET", "POST"])
+@login_required
 def assign_registered():
     return assign_registered_service.assign_registered(conn)
 

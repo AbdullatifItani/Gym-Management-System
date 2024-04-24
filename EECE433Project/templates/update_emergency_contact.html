@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Update Emergency Contact</title>
     <style>
-        /* Add your CSS styles here */
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
@@ -36,8 +35,20 @@
         th {
             background-color: #f2f2f2;
         }
+        label {
+            margin-bottom: 8px;
+            display: block;
+        }
+        input[type="text"] {
+            width: 40%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
         input[type="submit"] {
-            background-color: #ffcc00; /* Yellowish color */
+            background-color: #ffcc00;
             color: white;
             border: none;
             cursor: pointer;
@@ -45,7 +56,7 @@
             padding: 10px;
         }
         input[type="submit"]:hover {
-            background-color: #ffaa00; /* Darker shade of yellow on hover */
+            background-color: #ffaa00;
         }
     </style>
 </head>
@@ -83,7 +94,7 @@
             <button type="button" id="prevBtn" disabled>Prev</button>
             <button type="button" id="nextBtn">Next</button>
         </div>
-
+        <br>
         <label for="new_contact">New Contact Information:</label>
         <input type="text" name="new_contact" id="new_contact" required><br><br>
         <input type="submit" value="Update Contact">

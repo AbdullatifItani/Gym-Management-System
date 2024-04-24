@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Delete Member Package</title>
+    <title>Delete Package</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -20,15 +20,20 @@
             padding: 20px;
             border-radius: 5px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            width: 300px;
+            width: 800px;
         }
-        select {
+        table {
             width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
             border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
         }
         input[type="submit"] {
             background-color: #ff4444;
@@ -37,7 +42,7 @@
             cursor: pointer;
             border-radius: 4px;
             padding: 10px;
-            width: 100%;
+            width: 20%;
         }
         input[type="submit"]:hover {
             background-color: #cc0000;
@@ -47,15 +52,35 @@
 <body>
 
 <div class="container">
-    <h2>Delete Member Package</h2>
+    <h2>Delete Package</h2>
     <form action="/delete_package" method="POST">
-        <label for="package_id">Select Member Package:</label>
-        <select id="package_id" name="package_id" required>
-            {% for package in packages %}
-            <option value="{{ package[0] }}">{{ package[0] }} - {{ package[1] }}</option>
-            {% endfor %}
-        </select><br>
-        <input type="submit" value="Delete Member Package">
+        <table>
+            <thead>
+                <tr>
+                    <th>Select</th>
+                    <th>Package ID</th>
+                    <th>Package Name</th>
+                    <th>Description</th>
+                    <th>Price</th>
+                    <th>Duration</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for package in packages %}
+                <tr>
+                    <td>
+                        <input type="radio" name="package_id" value="{{ package[0] }}" required>
+                    </td>
+                    <td>{{ package[0] }}</td>
+                    <td>{{ package[1] }}</td>
+                    <td>{{ package[2] }}</td>
+                    <td>{{ package[3] }}</td>
+                    <td>{{ package[4] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <input type="submit" value="Delete Package">
     </form>
 </div>
 

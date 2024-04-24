@@ -1,17 +1,24 @@
-from flask import render_template, request
+from flask import render_template, request, session
+
+from EECE433Project.helper_functions import decode_token
+
 
 def display_emergency_contacts(conn):
-    member_id = request.args.get('member_id')
     cursor = conn.cursor()
-    
-    if member_id:
-        if member_id == '':
-            cursor.execute("SELECT * FROM EMERGENCY_CONTACT")
+    if 'admin' in session:
+        member_id = request.args.get('member_id')
+
+        if member_id:
+            if member_id == '':
+                cursor.execute("SELECT * FROM EMERGENCY_CONTACT")
+            else:
+                cursor.execute("SELECT * FROM EMERGENCY_CONTACT WHERE EMID = %s", (member_id,))
         else:
-            cursor.execute("SELECT * FROM EMERGENCY_CONTACT WHERE EMID = %s", (member_id,))
+            cursor.execute("SELECT * FROM EMERGENCY_CONTACT")
     else:
-        cursor.execute("SELECT * FROM EMERGENCY_CONTACT")
-    
+        member_id = decode_token(session['token'])
+        cursor.execute("SELECT * FROM EMERGENCY_CONTACT WHERE EMID = %s", (member_id,))
+
     emergency_contacts = cursor.fetchall()
     cursor.execute("SELECT MID, FNAME, LNAME FROM MEMBER")
     members = cursor.fetchall()

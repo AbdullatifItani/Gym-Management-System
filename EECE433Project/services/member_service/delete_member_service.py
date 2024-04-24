@@ -6,9 +6,6 @@ def delete_member(conn):
         mid = request.form["mid"]
 
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM MEMBER")
-        existing_members = cursor.fetchall()
-
         cursor.execute("DELETE FROM MEMBER WHERE MID = %s", (mid,))
         conn.commit()
 
