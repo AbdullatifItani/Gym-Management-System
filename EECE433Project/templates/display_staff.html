@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Staff</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-y: auto;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            width: 600px;
+            margin: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>All Staff</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Gender</th>
+                <th>DOB</th>
+                <th>Email</th>
+                <th>Contact</th>
+                <th>Salary</th>
+                <th>Position</th>
+                <th>Employment Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for staff_item in staff %}
+            <tr>
+                <td>{{ staff_item[0] }}</td>
+                <td>{{ staff_item[1] }}</td>
+                <td>{{ staff_item[2] }}</td>
+                <td>{{ staff_item[3] }}</td>
+                <td>{{ staff_item[4] }}</td>
+                <td>{{ staff_item[5] }}</td>
+                <td>{{ staff_item[7] }}</td>
+                <td>{{ staff_item[8] }}</td>
+                <td>{{ staff_item[9] }}</td>
+                <td>{{ staff_item[10] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>

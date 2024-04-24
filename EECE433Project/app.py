@@ -19,21 +19,25 @@ conn = psycopg2.connect(
 from EECE433Project.services import admin_service
 from EECE433Project.services.registered_service import assign_registered_service, delete_registered_service
 from EECE433Project.services.session_service import assign_session_service, delete_session_service
-from EECE433Project.services.staff_service import create_staff_service, update_staff_service, delete_staff_service
+from EECE433Project.services.staff_service import create_staff_service, update_staff_service, delete_staff_service, \
+    display_staff_service
 from EECE433Project.services.class_equipment_service import assign_class_equipment_service, \
     delete_class_equipment_service
 from EECE433Project.services.equipment_service import create_equipment_service, delete_equipment_service, \
-    update_equipment_service
-from EECE433Project.services.class_service import create_class_service, update_class_service, delete_class_service
+    update_equipment_service, display_equipment_service
+from EECE433Project.services.class_service import create_class_service, update_class_service, delete_class_service, \
+    display_classes_service
 from EECE433Project.services.member_gym_session_service import assign_member_gym_session_service, \
     delete_member_gym_session_service
-from EECE433Project.services.gym_session_service import create_gym_session_service, delete_gym_session_service
-from .services.package_service import create_package_service, update_package_service, delete_package_service
+from EECE433Project.services.gym_session_service import create_gym_session_service, delete_gym_session_service, \
+    display_gym_sessions_service
+from .services.package_service import create_package_service, update_package_service, delete_package_service, \
+    display_packages_service
 from EECE433Project.services.member_package_service import assign_member_package_service, delete_member_package_service
 from EECE433Project.services.member_service import create_member_service, update_member_contact_service, \
-    delete_member_service
+    delete_member_service, display_members_service
 from EECE433Project.services.emergency_contact_service import assign_emergency_contact_service, \
-    update_emergency_contact_service, delete_emergency_contact_service
+    update_emergency_contact_service, delete_emergency_contact_service, display_emergency_contacts_service
 from EECE433Project.services.auth_service import login_service, register_service
 from EECE433Project.services.logs_service import assign_logs_service, delete_logs_service
 from EECE433Project.services.review_service import create_review_service, delete_review_service
@@ -101,6 +105,10 @@ def update_member_contact():
 def delete_member():
     return delete_member_service.delete_member(conn)
 
+@app.route('/display_members', methods=["GET"])
+@admin_required
+def display_members():
+    return display_members_service.display_members(conn)
 
 # Member Service End #
 # Emergency Contact Service Start #
@@ -122,6 +130,11 @@ def update_emergency_contact():
 @admin_required
 def delete_emergency_contact():
     return delete_emergency_contact_service.delete_emergency_contact(conn)
+
+@app.route('/display_emergency_contacts', methods=['GET'])
+@admin_required
+def display_emergency_contacts():
+    return display_emergency_contacts_service.display_emergency_contacts(conn)
 
 
 # Emergency Contact Service End #
@@ -145,6 +158,10 @@ def update_package():
 def delete_package():
     return delete_package_service.delete_package(conn)
 
+@app.route('/display_packages', methods=['GET'])
+@admin_required
+def display_packages():
+    return display_packages_service.display_packages(conn)
 
 # Package Service End #
 # Member Package Service Start #
@@ -193,6 +210,11 @@ def create_gym_session():
 def delete_gym_session():
     return delete_gym_session_service.delete_gym_session(conn)
 
+@app.route('/display_gym_sessions', methods=['GET'])
+@admin_required
+def display_gym_sessions():
+    return display_gym_sessions_service.display_gym_sessions(conn)
+
 
 # Gym Session Service End #
 # Member Gym Session Service Start #
@@ -231,6 +253,11 @@ def update_class():
 def delete_class():
     return delete_class_service.delete_class(conn)
 
+@app.route('/display_classes', methods=['GET'])
+@admin_required
+def display_classes():
+    return display_classes_service.display_classes(conn)
+
 
 # Class Service End #
 # Equipment Service Start #
@@ -252,6 +279,11 @@ def update_equipment():
 @admin_required
 def delete_equipment():
     return delete_equipment_service.delete_equipment(conn)
+
+@app.route('/display_equipment', methods=['GET'])
+@admin_required
+def display_equipment():
+    return display_equipment_service.display_equipment(conn)
 
 
 # Equipment Service End #
@@ -290,6 +322,11 @@ def update_staff():
 @admin_required
 def delete_staff():
     return delete_staff_service.delete_staff(conn)
+
+@app.route('/display_staff', methods=['GET'])
+@admin_required
+def display_staff():
+    return display_staff_service.display_staff(conn)
 
 
 # Staff Service End #

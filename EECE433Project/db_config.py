@@ -1,5 +1,5 @@
-DB_NAME = 'gym'
+DB_NAME = 'Gym Management'
 DB_USER = 'postgres'
-DB_PASSWORD = 'mysql123'
+DB_PASSWORD = 'Abed12345'
 DB_HOST = '127.0.0.1'
 DB_PORT = '5432'
