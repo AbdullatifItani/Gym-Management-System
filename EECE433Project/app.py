@@ -33,7 +33,8 @@ from EECE433Project.services.gym_session_service import create_gym_session_servi
     display_gym_sessions_service
 from .services.package_service import create_package_service, update_package_service, delete_package_service, \
     display_packages_service
-from EECE433Project.services.member_package_service import assign_member_package_service, delete_member_package_service
+from EECE433Project.services.member_package_service import assign_member_package_service, delete_member_package_service, \
+    display_package_members_service, display_member_packages_service
 from EECE433Project.services.member_service import create_member_service, update_member_contact_service, \
     delete_member_service, display_members_service
 from EECE433Project.services.emergency_contact_service import assign_emergency_contact_service, \
@@ -177,6 +178,16 @@ def assign_member_package():
 @admin_required
 def delete_member_package():
     return delete_member_package_service.delete_member_package(conn)
+
+@app.route('/display_package_members', methods=['GET'])
+@admin_required
+def display_package_members():
+    return display_package_members_service.display_package_members(conn)
+
+@app.route('/display_member_packages', methods=['GET'])
+@admin_required
+def display_member_packages():
+    return display_member_packages_service.display_member_packages(conn)
 
 
 # Member Package Service End #
