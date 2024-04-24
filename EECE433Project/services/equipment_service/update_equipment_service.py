@@ -19,7 +19,7 @@ def update_equipment(conn):
         if not update_values:
             # Fetch equipment data from the database
             cursor = conn.cursor()
-            cursor.execute("SELECT EID, NAME FROM EQUIPMENT")
+            cursor.execute("SELECT EID, NAME, CONDITION FROM EQUIPMENT")
             equipment = cursor.fetchall()
             return render_template("update_equipment.html", equipment=equipment,
                                    error="At least one field must be provided for update")
@@ -38,7 +38,7 @@ def update_equipment(conn):
 
     # Fetch equipment data from the database
     cursor = conn.cursor()
-    cursor.execute("SELECT EID, NAME FROM EQUIPMENT")
+    cursor.execute("SELECT EID, NAME, CONDITION FROM EQUIPMENT")
     equipment = cursor.fetchall()
 
     # Render the form for updating equipment details and pass equipment data to the template

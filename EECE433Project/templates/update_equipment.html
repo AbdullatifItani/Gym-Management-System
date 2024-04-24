@@ -21,17 +21,20 @@
             padding: 20px;
             border-radius: 5px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            width: 300px;
+            width: 500px;
         }
-        select,
-        input[type="text"],
-        input[type="submit"] {
+        table {
             width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
             border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
         }
         input[type="submit"] {
             background-color: #ffcc00; /* Yellowish color */
@@ -39,14 +42,10 @@
             border: none;
             cursor: pointer;
             border-radius: 4px;
+            padding: 10px;
         }
         input[type="submit"]:hover {
             background-color: #ffaa00; /* Darker shade of yellow on hover */
-        }
-        p.error {
-            color: #ff0000;
-            margin-top: -10px;
-            margin-bottom: 10px;
         }
     </style>
 </head>
@@ -54,21 +53,100 @@
 
 <div class="container">
     <h2>Update Equipment Condition</h2>
-    <form method="POST">
-        <label for="eid">Select Equipment:</label>
-        <select name="eid" id="eid" required>
-            {% for item in equipment %}
-                <option value="{{ item[0] }}">{{ item[1] }}</option>
-            {% endfor %}
-        </select><br>
-        <label for="condition">Condition:</label>
-        <input type="text" name="condition" id="condition"><br>
-        <input type="submit" value="Update Equipment">
+
+    <form method="POST" id="equipmentForm">
+        <table>
+            <thead>
+                <tr>
+                    <th>Select</th>
+                    <th>Equipment ID</th>
+                    <th>Name</th>
+                    <th>Condition</th>
+                </tr>
+            </thead>
+            <tbody id="equipmentTableBody">
+                <!-- Equipment items will be dynamically loaded here -->
+            </tbody>
+        </table>
+
+        <div id="pagination">
+            <button type="button" id="prevBtn" disabled>Prev</button>
+            <button type="button" id="nextBtn">Next</button>
+        </div>
+
+        <input type="hidden" name="eid" id="eid" value=""> <!-- Hidden field for eid -->
+
+        <label for="new_condition">New Condition:</label>
+        <input type="text" name="condition" id="condition" required><br><br>
+        <input type="submit" value="Update Condition">
     </form>
-    {% if error %}
-        <p class="error">{{ error }}</p>
-    {% endif %}
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const equipment = JSON.parse('{{ equipment|tojson }}');
+        const tableBody = document.getElementById('equipmentTableBody');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const eidField = document.getElementById('eid'); // Added eidField
+        let currentPage = 1;
+        const itemsPerPage = 10;
+
+        function displayEquipment(page) {
+            const start = (page - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const paginatedEquipment = equipment.slice(start, end);
+
+            tableBody.innerHTML = ''; // Clear table body
+
+            paginatedEquipment.forEach(item => {
+                const row = `
+                    <tr>
+                        <td>
+                            <input type="radio" name="eid_name" value="${item[0]}" required>
+                        </td>
+                        <td>${item[0]}</td>
+                        <td>${item[1]}</td>
+                        <td>${item[2]}</td>
+                    </tr>
+                `;
+                tableBody.innerHTML += row;
+            });
+
+            // Check if there are more items to display
+            if (equipment.length <= end) {
+                nextBtn.disabled = true;
+            } else {
+                nextBtn.disabled = false;
+            }
+        }
+
+        nextBtn.addEventListener('click', function() {
+            currentPage++;
+            displayEquipment(currentPage);
+            prevBtn.disabled = false;
+        });
+
+        prevBtn.addEventListener('click', function() {
+            currentPage--;
+            displayEquipment(currentPage);
+            if (currentPage === 1) {
+                prevBtn.disabled = true;
+            }
+            nextBtn.disabled = false; // Enable next button when going back
+        });
+
+        displayEquipment(currentPage);
+
+        // Add event listener for radio buttons to update eid field value
+        const radioButtons = document.querySelectorAll('input[name="eid_name"]');
+        radioButtons.forEach(button => {
+            button.addEventListener('change', function() {
+                eidField.value = this.value; // Update eid field value
+            });
+        });
+    });
+</script>
 
 </body>
 </html>

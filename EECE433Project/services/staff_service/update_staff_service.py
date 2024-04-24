@@ -29,7 +29,7 @@ def update_staff(conn):
         if not update_values:
             # Fetch staff data from the database
             cursor = conn.cursor()
-            cursor.execute("SELECT SID, FNAME, LNAME FROM STAFF")
+            cursor.execute("SELECT SID, FNAME, LNAME, CONTACT, SALARY, POSITION FROM STAFF")
             staff = cursor.fetchall()
             return render_template("update_staff.html", staff=staff,
                                    error="At least one field must be provided for update")
@@ -48,7 +48,7 @@ def update_staff(conn):
 
     # Fetch staff data from the database
     cursor = conn.cursor()
-    cursor.execute("SELECT SID, FNAME, LNAME FROM STAFF")
+    cursor.execute("SELECT SID, FNAME, LNAME, CONTACT, SALARY, POSITION FROM STAFF")
     staff = cursor.fetchall()
 
     # Render the form for updating staff details and pass staff data to the template

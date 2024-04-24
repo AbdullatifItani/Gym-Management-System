@@ -17,6 +17,6 @@ def update_member_contact(conn):
 
     # Fetch member data from the database
     cursor = conn.cursor()
-    cursor.execute("SELECT MID, FNAME, LNAME FROM MEMBER")
+    cursor.execute("SELECT MID, FNAME, LNAME, CONTACT FROM MEMBER")
     member_data = cursor.fetchall()
     return render_template("update_member_contact.html", members=member_data)

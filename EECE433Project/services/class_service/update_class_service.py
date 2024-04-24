@@ -22,7 +22,7 @@ def update_class(conn):
 
         # Fetch class data from the database
         cursor = conn.cursor()
-        cursor.execute("SELECT CID, CNAME FROM CLASS")
+        cursor.execute("SELECT CID, CNAME, MAX_CAP, DESCRIPTION FROM CLASS")
         classes = cursor.fetchall()
 
         # If no fields are provided for update, return an error
@@ -44,7 +44,7 @@ def update_class(conn):
 
     # Fetch class data from the database
     cursor = conn.cursor()
-    cursor.execute("SELECT CID, CNAME FROM CLASS")
+    cursor.execute("SELECT CID, CNAME, MAX_CAP, DESCRIPTION FROM CLASS")
     classes = cursor.fetchall()
 
     # Render the form for updating class details and pass class data to the template

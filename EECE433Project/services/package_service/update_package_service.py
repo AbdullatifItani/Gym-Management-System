@@ -27,7 +27,7 @@ def update_package(conn):
 
         # Fetch package data from the database
         cursor = conn.cursor()
-        cursor.execute("SELECT PID, PNAME FROM PACKAGE")
+        cursor.execute("SELECT PID, PNAME, DESCRIPTION, PRICE, DURATION FROM PACKAGE")
         packages = cursor.fetchall()
 
         # If no fields are provided for update, return an error
@@ -48,7 +48,7 @@ def update_package(conn):
         return redirect("/admin")
 
     cursor = conn.cursor()
-    cursor.execute("SELECT PID, PNAME FROM PACKAGE")
+    cursor.execute("SELECT PID, PNAME, DESCRIPTION, PRICE, DURATION FROM PACKAGE")
     packages = cursor.fetchall()
     # Render the form for updating package details and pass package data to the template
     return render_template("update_package.html", packages=packages)

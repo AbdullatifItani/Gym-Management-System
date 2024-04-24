@@ -21,7 +21,7 @@
             padding: 20px;
             border-radius: 5px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            width: 300px;
+            width: 500px;
         }
         select,
         input[type="number"],
@@ -49,29 +49,123 @@
             margin-top: -10px;
             margin-bottom: 10px;
         }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h2>Update Class Details</h2>
-    <form method="POST">
-        <label for="cid">Select Class:</label>
-        <select name="cid" id="cid" required>
-            {% for class in classes %}
-                <option value="{{ class[0] }}">{{ class[1] }}</option>
-            {% endfor %}
-        </select><br>
-        <label for="max_cap">Max Capacity:</label>
+    <form method="POST" id="classForm">
+        <input type="hidden" name="cid" id="cid" value=""> <!-- Hidden field for cid -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Select</th>
+                    <th>Class ID</th>
+                    <th>Class Name</th>
+                    <th>Max Capacity</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody id="classTableBody">
+                <!-- Class data will be populated here -->
+            </tbody>
+        </table>
+        <div id="pagination">
+            <button type="button" id="prevBtn" disabled>Prev</button>
+            <button type="button" id="nextBtn">Next</button>
+        </div>
+        <label for="max_cap">New Max Capacity:</label>
         <input type="number" name="max_cap" id="max_cap" min="0"><br>
-        <label for="description">Description:</label>
+        <label for="description">New Description:</label>
         <input type="text" name="description" id="description"><br>
         <input type="submit" value="Update Class">
     </form>
-    {% if error %}
-        <p class="error">{{ error }}</p>
-    {% endif %}
+    <p id="error" class="error"></p>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const classes = JSON.parse('{{ classes|tojson }}');
+        const tableBody = document.getElementById('classTableBody');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const cidField = document.getElementById('cid');
+        let currentPage = 1;
+        const itemsPerPage = 10;
+
+        function displayClasses(page) {
+            const start = (page - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const paginatedClasses = classes.slice(start, end);
+
+            tableBody.innerHTML = ''; // Clear table body
+
+            paginatedClasses.forEach(classItem => {
+                const row = `
+                    <tr>
+                        <td>
+                            <input type="radio" name="cid_description" value="${classItem[0]}|${classItem[1]}" required>
+                        </td>
+                        <td>${classItem[0]}</td>
+                        <td>${classItem[1]}</td>
+                        <td>${classItem[2]}</td>
+                        <td>${classItem[3]}</td>
+                    </tr>
+                `;
+                tableBody.innerHTML += row;
+            });
+
+            // Check if there are more classes to display
+            if (classes.length <= end) {
+                nextBtn.disabled = true;
+            } else {
+                nextBtn.disabled = false;
+            }
+        }
+
+        nextBtn.addEventListener('click', function() {
+            currentPage++;
+            displayClasses(currentPage);
+            prevBtn.disabled = false;
+        });
+
+        prevBtn.addEventListener('click', function() {
+            currentPage--;
+            displayClasses(currentPage);
+            if (currentPage === 1) {
+                prevBtn.disabled = true;
+            }
+            nextBtn.disabled = false; // Enable next button when going back
+        });
+
+        displayClasses(currentPage);
+
+        // Add event listener for radio buttons to update cid field value
+        const radioButtons = document.querySelectorAll('input[name="cid_description"]');
+        radioButtons.forEach(button => {
+            button.addEventListener('change', function() {
+                const value = this.value.split('|')[0]; // Extract class ID from value
+                cidField.value = value; // Update cid field value
+            });
+        });
+    });
+</script>
+
 
 </body>
 </html>
+

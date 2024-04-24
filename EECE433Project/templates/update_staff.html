@@ -21,7 +21,7 @@
             padding: 20px;
             border-radius: 5px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            width: 300px;
+            width: 600px;
         }
         select,
         input[type="text"],
@@ -49,19 +49,47 @@
             margin-top: -10px;
             margin-bottom: 10px;
         }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h2>Update Staff Details</h2>
-    <form method="POST">
-        <label for="sid">Select Staff Member:</label>
-        <select name="sid" id="sid" required>
-            {% for member in staff %}
-                <option value="{{ member[0] }}">{{ member[1] }} {{ member[2] }}</option>
-            {% endfor %}
-        </select><br>
+    <form method="POST" id="staffForm">
+        <input type="hidden" name="sid" id="sid" value=""> <!-- Hidden field for sid -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Select</th>
+                    <th>Staff ID</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Contact</th>
+                    <th>Salary</th>
+                    <th>Position</th>
+                </tr>
+            </thead>
+            <tbody id="staffTableBody">
+                <!-- Staff data will be populated here -->
+            </tbody>
+        </table>
+        <div id="pagination">
+            <button type="button" id="prevBtn" disabled>Prev</button>
+            <button type="button" id="nextBtn">Next</button>
+        </div>
         <label for="contact">Contact:</label>
         <input type="text" name="contact" id="contact"><br>
         <label for="salary">Salary:</label>
@@ -70,10 +98,79 @@
         <input type="text" name="position" id="position"><br>
         <input type="submit" value="Update Staff">
     </form>
-    {% if error %}
-        <p class="error">{{ error }}</p>
-    {% endif %}
+    <p id="error" class="error"></p>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const staff = JSON.parse('{{ staff|tojson }}');
+        const tableBody = document.getElementById('staffTableBody');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const sidField = document.getElementById('sid');
+        let currentPage = 1;
+        const itemsPerPage = 10;
+
+        function displayStaff(page) {
+            const start = (page - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const paginatedStaff = staff.slice(start, end);
+
+            tableBody.innerHTML = ''; // Clear table body
+
+            paginatedStaff.forEach(staffMember => {
+                const row = `
+                    <tr>
+                        <td>
+                            <input type="radio" name="sid" value="${staffMember[0]}" required>
+                        </td>
+                        <td>${staffMember[0]}</td>
+                        <td>${staffMember[1]}</td>
+                        <td>${staffMember[2]}</td>
+                        <td>${staffMember[3]}</td>
+                        <td>${staffMember[4]}</td>
+                        <td>${staffMember[5]}</td>
+                    </tr>
+                `;
+                tableBody.innerHTML += row;
+            });
+
+            // Check if there are more staff members to display
+            if (staff.length <= end) {
+                nextBtn.disabled = true;
+            } else {
+                nextBtn.disabled = false;
+            }
+        }
+
+        nextBtn.addEventListener('click', function() {
+            currentPage++;
+            displayStaff(currentPage);
+            prevBtn.disabled = false;
+        });
+
+        prevBtn.addEventListener('click', function() {
+            currentPage--;
+            displayStaff(currentPage);
+            if (currentPage === 1) {
+                prevBtn.disabled = true;
+            }
+            nextBtn.disabled = false; // Enable next button when going back
+        });
+
+        displayStaff(currentPage);
+
+        // Add event listener for radio buttons to update sid field value
+        const radioButtons = document.querySelectorAll('input[name="sid"]');
+        radioButtons.forEach(button => {
+            button.addEventListener('change', function() {
+                sidField.value = this.value; // Update sid field value
+            });
+        });
+    });
+</script>
 
 </body>
 </html>
+
+

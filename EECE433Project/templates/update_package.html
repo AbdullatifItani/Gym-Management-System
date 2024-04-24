@@ -21,7 +21,7 @@
             padding: 20px;
             border-radius: 5px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            width: 300px;
+            width: 700px; /* Widened container */
         }
         select,
         input[type="text"],
@@ -49,24 +49,51 @@
             margin-top: -10px;
             margin-bottom: 10px;
         }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h2>Update Package Details</h2>
-    <form method="POST">
-        <label for="pid">Select Package:</label>
-        <select name="pid" id="pid" required>
-            {% for package in packages %}
-                <option value="{{ package[0] }}">{{ package[1] }}</option>
-            {% endfor %}
-        </select><br>
-        <label for="description">Description:</label>
+    <form method="POST" id="packageForm">
+        <input type="hidden" name="pid" id="pid" value=""> <!-- Hidden field for pid -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Select</th>
+                    <th>Package ID</th>
+                    <th>Package Name</th>
+                    <th>Description</th>
+                    <th>Price</th>
+                    <th>Duration</th>
+                </tr>
+            </thead>
+            <tbody id="packageTableBody">
+                <!-- Package data will be populated here -->
+            </tbody>
+        </table>
+        <div id="pagination">
+            <button type="button" id="prevBtn" disabled>Prev</button>
+            <button type="button" id="nextBtn">Next</button>
+        </div>
+        <label for="description">New Description:</label>
         <input type="text" name="description" id="description"><br>
-        <label for="price">Price:</label>
+        <label for="price">New Price:</label>
         <input type="number" name="price" id="price" min="0"><br>
-        <label for="duration">Duration:</label>
+        <label for="duration">New Duration:</label>
         <input type="text" name="duration" id="duration"><br>
         <input type="submit" value="Update Package">
     </form>
@@ -74,6 +101,75 @@
         <p class="error">{{ error }}</p>
     {% endif %}
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const packages = JSON.parse('{{ packages|tojson }}');
+        const tableBody = document.getElementById('packageTableBody');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const pidField = document.getElementById('pid');
+        let currentPage = 1;
+        const itemsPerPage = 10;
+
+        function displayPackages(page) {
+            const start = (page - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const paginatedPackages = packages.slice(start, end);
+
+            tableBody.innerHTML = ''; // Clear table body
+
+            paginatedPackages.forEach(packageItem => {
+                const row = `
+                    <tr>
+                        <td>
+                            <input type="radio" name="pid_description" value="${packageItem[0]}|${packageItem[1]}" required>
+                        </td>
+                        <td>${packageItem[0]}</td>
+                        <td>${packageItem[1]}</td>
+                        <td>${packageItem[2]}</td>
+                        <td>${packageItem[3]}</td>
+                        <td>${packageItem[4]}</td>
+                    </tr>
+                `;
+                tableBody.innerHTML += row;
+            });
+
+            // Check if there are more packages to display
+            if (packages.length <= end) {
+                nextBtn.disabled = true;
+            } else {
+                nextBtn.disabled = false;
+            }
+        }
+
+        nextBtn.addEventListener('click', function() {
+            currentPage++;
+            displayPackages(currentPage);
+            prevBtn.disabled = false;
+        });
+
+        prevBtn.addEventListener('click', function() {
+            currentPage--;
+            displayPackages(currentPage);
+            if (currentPage === 1) {
+                prevBtn.disabled = true;
+            }
+            nextBtn.disabled = false; // Enable next button when going back
+        });
+
+        displayPackages(currentPage);
+
+        // Add event listener for radio buttons to update pid field value
+        const radioButtons = document.querySelectorAll('input[name="pid_description"]');
+        radioButtons.forEach(button => {
+            button.addEventListener('change', function() {
+                const value = this.value.split('|')[0]; // Extract package ID from value
+                pidField.value = value; // Update pid field value
+            });
+        });
+    });
+</script>
 
 </body>
 </html>
