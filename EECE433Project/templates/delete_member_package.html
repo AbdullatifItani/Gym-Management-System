@@ -47,6 +47,7 @@
 
 <div class="container">
     <h2>Delete Member Package</h2>
+    {% if 'admin' in session %}
     <form action="/delete_member_package" method="POST">
         <label for="member_package_id">Select Member Package ID to Delete:</label>
         <select id="member_package_id" name="member_package_id" required>
@@ -56,6 +57,37 @@
         </select><br>
         <input type="submit" value="Delete Member Package">
     </form>
+    {% else %}
+    <h3>Select Package:</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Select</th>
+                    <th>Package ID</th>
+                    <th>Package Name</th>
+                    <th>Description</th>
+                    <th>Price</th>
+                    <th>Duration</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for package in member_packages %}
+                <tr>
+                    <td>
+                        <input type="radio" name="ppid" value="{{ package[0] }}|{{ package[4] }}" required>
+                    </td>
+                    <td>{{ package[0] }}</td>
+                    <td>{{ package[1] }}</td>
+                    <td>{{ package[2] }}</td>
+                    <td>{{ package[3] }}</td>
+                    <td>{{ package[4] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <input type="submit" value="Assign Member Package">
+    </form>
+    {% endif %}
 </div>
 
 </body>

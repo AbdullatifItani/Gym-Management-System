@@ -20,9 +20,22 @@
             padding: 20px;
             border-radius: 5px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            width: 300px;
+            width: 700px;
         }
-        select, input[type="submit"] {
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        input[type="submit"] {
             width: 100%;
             padding: 10px;
             margin-bottom: 15px;
@@ -47,12 +60,30 @@
 <div class="container">
     <h2>Delete Review</h2>
     <form action="/delete_review" method="POST">
-        <label for="review_id">Select Review:</label>
-        <select id="review_id" name="review_id" required>
-            {% for review in reviews %}
-            <option value="{{ review[0] }}">{{ review[1] }}</option>
-            {% endfor %}
-        </select><br>
+        <h3>Select Review:</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Select</th>
+                    <th>Member ID</th>
+                    <th>Package ID</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for review in reviews %}
+                <tr>
+                    <td>
+                        <input type="radio" name="ppid" value="{{ review[1] }}" required>
+                    </td>
+                    <td>{{ review[0] }}</td>
+                    <td>{{ review[1] }}</td>
+                    <td>{{ review[2] }}</td>
+                    <td>{{ review[3] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
         <input type="submit" value="Delete Review">
     </form>
 </div>

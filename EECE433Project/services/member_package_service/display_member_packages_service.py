@@ -1,7 +1,12 @@
-from flask import render_template, request
+from flask import render_template, request, session
+from EECE433Project.helper_functions import decode_token
+
 
 def display_member_packages(conn):
-    member_id = request.args.get('member_id')
+    if 'admin' in session:
+        member_id = request.args.get('member_id')
+    else:
+        member_id = decode_token(session['token'])
     
     cursor = conn.cursor()
     cursor.execute("SELECT PACKAGE.PID, PACKAGE.PNAME, MEMBER_PACKAGE.START_DATE, MEMBER_PACKAGE.END_DATE FROM PACKAGE INNER JOIN MEMBER_PACKAGE ON PACKAGE.PID = MEMBER_PACKAGE.PPID WHERE MEMBER_PACKAGE.PMID = %s", (member_id,))

@@ -55,6 +55,10 @@
         input[type="submit"]:hover {
             background-color: #45a049;
         }
+        .error-message {
+            color: #ff0000; /* Red color for error message */
+            font-size: 16px;
+        }
     </style>
 </head>
 <body>
@@ -62,6 +66,7 @@
 <div class="container">
     <h2>Assign Member Package</h2>
     <form action="/assign_member_package" method="POST">
+        {% if 'admin' in session %}
         <h3>Select Member:</h3>
         <table>
             <thead>
@@ -95,6 +100,9 @@
                 {% endfor %}
             </tbody>
         </table>
+        {% else %}
+        <h4>Register for a package</h4>
+        {% endif %}
         <h3>Select Package:</h3>
         <table>
             <thead>
@@ -124,6 +132,9 @@
         </table>
         <input type="submit" value="Assign Member Package">
     </form>
+    {% if error %}
+    <p class="error-message">{{ error }}</p>
+    {% endif %}
 </div>
 
 </body>
