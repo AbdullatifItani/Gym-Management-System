@@ -1,9 +1,12 @@
-from flask import request, redirect, render_template
-
+from flask import request, redirect, render_template, session
+from EECE433Project.helper_functions import decode_token
 
 def assign_member_gym_session(conn):
     if request.method == "POST":
-        gmid = request.form["gmid"]
+        if 'admin' in session:
+            gmid = request.form["gmid"]
+        else:
+            gmid = decode_token(session['token'])
         gdate_time = request.form["gdate_time"]
 
         cursor = conn.cursor()
@@ -11,7 +14,7 @@ def assign_member_gym_session(conn):
                         VALUES (%s, %s)""",
                        (gmid, gdate_time))
         conn.commit()
-        return redirect("/admin")
+        return redirect("/")
     # Fetch member and gym session data to populate dropdowns
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM MEMBER")

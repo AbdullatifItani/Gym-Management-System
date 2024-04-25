@@ -10,6 +10,7 @@
 
 <div class="container">
     <h1>Reviews</h1>
+    {% if 'admin' in session %}
     <form action="/display_reviews" method="GET">
         <label for="member_id">Select Member:</label>
         <select id="member_id" name="member_id">
@@ -20,6 +21,7 @@
         </select>
         <button type="submit">Show Reviews</button>
     </form>
+    {% endif %}
     
     <table>
         <thead>

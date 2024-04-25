@@ -18,6 +18,6 @@ def assign_registered(conn):
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM MEMBER")
     member_data = cursor.fetchall()
-    cursor.execute("SELECT * FROM SESSION")
+    cursor.execute("SELECT MEMBER.MID, MEMBER.FNAME, MEMBER.LNAME, CLASS.CID, CLASS.CNAME, SESSION.SDATE, STAFF.FNAME, STAFF.LNAME, STAFF.SID FROM MEMBER INNER JOIN REGISTERED ON MEMBER.MID = REGISTERED.REGMID INNER JOIN SESSION ON REGISTERED.REGSID = SESSION.SCID INNER JOIN CLASS ON SESSION.SCID = CLASS.CID INNER JOIN STAFF ON SESSION.SSID = STAFF.SID")
     session_data = cursor.fetchall()
     return render_template("assign_registered.html", members=member_data, sessions=session_data)

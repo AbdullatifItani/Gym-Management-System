@@ -168,6 +168,7 @@ def delete_package():
 
 
 @app.route('/display_packages', methods=['GET'])
+@login_required
 def display_packages():
     return display_packages_service.display_packages(conn)
 
@@ -238,6 +239,7 @@ def delete_gym_session():
 
 
 @app.route('/display_gym_sessions', methods=['GET'])
+@admin_required
 def display_gym_sessions():
     return display_gym_sessions_service.display_gym_sessions(conn)
 
@@ -265,7 +267,7 @@ def display_gym_session_members():
 
 
 @app.route('/display_member_gym_sessions', methods=['GET'])
-@admin_required
+@login_required
 def display_member_gym_sessions():
     return display_member_gym_sessions_service.display_member_gym_sessions(conn)
 
@@ -412,7 +414,7 @@ def delete_session():
     return delete_session_service.delete_session(conn)
 
 @app.route('/display_classes_of_staff', methods=['GET'])
-@admin_required
+@login_required
 def display_classes_of_staff():
     return display_classes_of_staff_service.display_classes_of_staff(conn)
 
@@ -429,7 +431,7 @@ def assign_registered():
 
 
 @app.route('/delete_registered', methods=["GET", "POST"])
-@admin_required
+@login_required
 def delete_registered():
     return delete_registered_service.delete_registered(conn)
 
@@ -439,7 +441,7 @@ def display_registered_members_of_each_session():
     return display_registered_members_of_each_session_service.display_registered_members_of_each_session(conn)
 
 @app.route('/display_registered_sessions_of_each_member', methods=['GET'])
-@admin_required
+@login_required
 def display_registered_sessions_of_each_member():
     return display_registered_sessions_of_each_member_service.display_registered_sessions_of_each_member(conn)
 # Registered Service End #
