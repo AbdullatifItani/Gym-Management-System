@@ -41,7 +41,8 @@ from EECE433Project.services.emergency_contact_service import assign_emergency_c
     update_emergency_contact_service, delete_emergency_contact_service, display_emergency_contacts_service
 from EECE433Project.services.auth_service import login_service, register_service
 from EECE433Project.services.logs_service import assign_logs_service, delete_logs_service
-from EECE433Project.services.review_service import create_review_service, delete_review_service
+from EECE433Project.services.review_service import create_review_service, delete_review_service, \
+    display_reviews_service
 from EECE433Project.helper_functions import admin_required, login_required
 
 
@@ -210,6 +211,11 @@ def create_review():
 @login_required
 def delete_review():
     return delete_review_service.delete_review(conn)
+
+@app.route('/display_reviews', methods=["GET"])
+@login_required
+def display_reviews():
+    return display_reviews_service.display_reviews(conn)
 
 
 # Review Service End #
