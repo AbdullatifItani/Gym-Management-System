@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Member Gym Sessions</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="container">
+    <h1>Member Gym Sessions</h1>
+    <form action="/display_member_gym_sessions" method="GET">
+        <label for="member_id">Select Member:</label>
+        <select id="member_id" name="member_id">
+            <option value="">All Members</option>
+            {% for member in members %}
+                <option value="{{ member[0] }}">{{ member[1] }} {{ member[2] }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Show Gym Sessions</button>
+    </form>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Member ID</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Session Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for session in member_gym_sessions %}
+            <tr>
+                <td>{{ session[0] }}</td>
+                <td>{{ session[1] }}</td>
+                <td>{{ session[2] }}</td>
+                <td>{{ session[3] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>

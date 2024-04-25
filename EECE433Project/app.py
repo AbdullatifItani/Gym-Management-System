@@ -28,7 +28,7 @@ from EECE433Project.services.equipment_service import create_equipment_service, 
 from EECE433Project.services.class_service import create_class_service, update_class_service, delete_class_service, \
     display_classes_service
 from EECE433Project.services.member_gym_session_service import assign_member_gym_session_service, \
-    delete_member_gym_session_service
+    delete_member_gym_session_service, display_gym_session_members_service, display_member_gym_sessions_service
 from EECE433Project.services.gym_session_service import create_gym_session_service, delete_gym_session_service, \
     display_gym_sessions_service
 from .services.package_service import create_package_service, update_package_service, delete_package_service, \
@@ -253,6 +253,18 @@ def assign_member_gym_session():
 @login_required
 def delete_member_gym_session():
     return delete_member_gym_session_service.delete_member_gym_session(conn)
+
+
+@app.route('/display_gym_session_members', methods=['GET'])
+@admin_required
+def display_gym_session_members():
+    return display_gym_session_members_service.display_gym_session_members(conn)
+
+
+@app.route('/display_member_gym_sessions', methods=['GET'])
+@admin_required
+def display_member_gym_sessions():
+    return display_member_gym_sessions_service.display_member_gym_sessions(conn)
 
 
 # Member Gym Session Service End #
