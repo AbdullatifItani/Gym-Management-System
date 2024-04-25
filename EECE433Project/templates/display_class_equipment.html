@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Equipment</title>
+    <link rel="stylesheet" href="static/styles.css">
+</head>
+<body>
+
+<div class="container">
+    <h1>Class Equipment</h1>
+    <form action="/display_class_equipment" method="GET">
+        <label for="class_id">Select Class:</label>
+        <select id="class_id" name="class_id">
+            <option value="">All Classes</option>
+            {% for class_info in classes %}
+                <option value="{{ class_info[0] }}">{{ class_info[1] }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Show Equipment</button>
+    </form>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Class ID</th>
+                <th>Class Name</th>
+                <th>Equipment Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for equipment in class_equipment %}
+            <tr>
+                <td>{{ equipment[0] }}</td>
+                <td>{{ equipment[1] }}</td>
+                <td>{{ equipment[2] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>

@@ -17,12 +17,14 @@ conn = psycopg2.connect(
 )
 
 from EECE433Project.services import admin_service
-from EECE433Project.services.registered_service import assign_registered_service, delete_registered_service
-from EECE433Project.services.session_service import assign_session_service, delete_session_service
+from EECE433Project.services.registered_service import assign_registered_service, delete_registered_service, \
+    display_registered_members_of_each_session_service, display_registered_sessions_of_each_member_service 
+from EECE433Project.services.session_service import assign_session_service, delete_session_service, \
+    display_classes_of_staff_service
 from EECE433Project.services.staff_service import create_staff_service, update_staff_service, delete_staff_service, \
     display_staff_service
 from EECE433Project.services.class_equipment_service import assign_class_equipment_service, \
-    delete_class_equipment_service
+    delete_class_equipment_service, display_class_equipment_service
 from EECE433Project.services.equipment_service import create_equipment_service, delete_equipment_service, \
     update_equipment_service, display_equipment_service
 from EECE433Project.services.class_service import create_class_service, update_class_service, delete_class_service, \
@@ -40,7 +42,8 @@ from EECE433Project.services.member_service import create_member_service, update
 from EECE433Project.services.emergency_contact_service import assign_emergency_contact_service, \
     update_emergency_contact_service, delete_emergency_contact_service, display_emergency_contacts_service
 from EECE433Project.services.auth_service import login_service, register_service
-from EECE433Project.services.logs_service import assign_logs_service, delete_logs_service
+from EECE433Project.services.logs_service import assign_logs_service, delete_logs_service, \
+    display_logs_service
 from EECE433Project.services.review_service import create_review_service, delete_review_service, \
     display_reviews_service
 from EECE433Project.helper_functions import admin_required, login_required
@@ -338,6 +341,12 @@ def delete_class_equipment():
     return delete_class_equipment_service.delete_class_equipment(conn)
 
 
+@app.route('/display_class_equipment', methods=['GET'])
+@admin_required
+def display_class_equipment():
+    return display_class_equipment_service.display_class_equipment(conn)
+
+
 # Class Equipment Service End #
 # Staff Service Start #
 
@@ -381,6 +390,11 @@ def assign_logs():
 def delete_logs():
     return delete_logs_service.delete_logs(conn)
 
+@app.route('/display_logs', methods=['GET'])
+@admin_required
+def display_logs():
+    return display_logs_service.display_logs(conn)
+
 
 # Logs Service End #
 # Session Service Start #
@@ -396,6 +410,12 @@ def assign_session():
 @admin_required
 def delete_session():
     return delete_session_service.delete_session(conn)
+
+@app.route('/display_classes_of_staff', methods=['GET'])
+@admin_required
+def display_classes_of_staff():
+    return display_classes_of_staff_service.display_classes_of_staff(conn)
+
 
 
 # Session Service End #
@@ -413,7 +433,15 @@ def assign_registered():
 def delete_registered():
     return delete_registered_service.delete_registered(conn)
 
+@app.route('/display_registered_members_of_each_session', methods=['GET'])
+@admin_required
+def display_registered_members_of_each_session():
+    return display_registered_members_of_each_session_service.display_registered_members_of_each_session(conn)
 
+@app.route('/display_registered_sessions_of_each_member', methods=['GET'])
+@admin_required
+def display_registered_sessions_of_each_member():
+    return display_registered_sessions_of_each_member_service.display_registered_sessions_of_each_member(conn)
 # Registered Service End #
 
 

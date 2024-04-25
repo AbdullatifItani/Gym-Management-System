@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registered Sessions of Each Member</title>
+    <link rel="stylesheet" href="static/styles.css">
+</head>
+<body>
+<div class="container">
+    <h1>Registered Sessions of Each Member</h1>
+    <form action="/display_registered_sessions_of_each_member" method="GET">
+        <label for="member_id">Select Member:</label>
+        <select id="member_id" name="member_id">
+            <option value="">All Members</option>
+            {% for member in members %}
+                <option value="{{ member[0] }}">{{ member[1] }} {{ member[2] }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Show Registered Sessions</button>
+    </form>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Member ID</th>
+                <th>Member Name</th>
+                <th>Class ID</th>
+                <th>Class Name</th>
+                <th>Session Date</th>
+                <th>Staff Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for session_member in member_registered_sessions %}
+                <tr>
+                    <td>{{ session_member[0] }}</td>
+                    <td>{{ session_member[1] }} {{ session_member[2] }}</td>
+                    <td>{{ session_member[3] }}</td>
+                    <td>{{ session_member[4] }}</td>
+                    <td>{{ session_member[5] }}</td>
+                    <td>{{ session_member[6] }} {{ session_member[7] }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

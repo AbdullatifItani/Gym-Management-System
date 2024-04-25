@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classes of Each Staff</title>
+    <link rel="stylesheet" href="static/styles.css">
+</head>
+<body>
+<div class="container">
+    <h1>Classes of Each Staff</h1>
+    <form action="/display_classes_of_staff" method="GET">
+        <label for="staff_id">Select Staff:</label>
+        <select id="staff_id" name="staff_id">
+            <option value="">All Staff</option>
+            {% for staff_member in staff_members %}
+                <option value="{{ staff_member[0] }}">{{ staff_member[1] }} {{ staff_member[2] }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Show Classes</button>
+    </form>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Class ID</th>
+                <th>Class Name</th>
+                <th>Session Date</th>
+                <th>Staff Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for staff_class in staff_classes %}
+                <tr>
+                    <td>{{ staff_class[0] }}</td>
+                    <td>{{ staff_class[1] }}</td>
+                    <td>{{ staff_class[2] }}</td>
+                    <td>{{ staff_class[3] }} {{ staff_class[4] }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

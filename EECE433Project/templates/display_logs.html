@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equipment Maintenance Logs</title>
+    <link rel="stylesheet" href="static/styles.css">
+</head>
+<body>
+
+<div class="container">
+    <h1>Equipment Maintenance Logs</h1>
+    <form action="/display_logs" method="GET">
+        <label for="equipment_id">Select Equipment:</label>
+        <select id="equipment_id" name="equipment_id">
+            <option value="">All Equipment</option>
+            {% for equipment_info in equipments %}
+                <option value="{{ equipment_info[0] }}">{{ equipment_info[1] }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Show Maintenance Logs</button>
+    </form>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Equipment ID</th>
+                <th>Equipment Name</th>
+                <th>Log ID</th>
+                <th>Staff First Name</th>
+                <th>Staff Last Name</th>
+                <th>Date</th>
+                <th>Details</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in equipment_maintenance %}
+            <tr>
+                <td>{{ log[0] }}</td>
+                <td>{{ log[1] }}</td>
+                <td>{{ log[2] }}</td>
+                <td>{{ log[3] }}</td>
+                <td>{{ log[4] }}</td>
+                <td>{{ log[5] }}</td>
+                <td>{{ log[6] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>
