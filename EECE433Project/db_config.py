@@ -1,5 +1,5 @@
-DB_NAME = 'gym'
+DB_NAME = 'Gym'
 DB_USER = 'postgres'
-DB_PASSWORD = 'Abed12345'
+DB_PASSWORD = 'pikacrafter'
 DB_HOST = '127.0.0.1'
 DB_PORT = '5432'

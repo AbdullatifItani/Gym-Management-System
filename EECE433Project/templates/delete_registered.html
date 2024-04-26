@@ -73,6 +73,11 @@
                     <tr>
                         <td>
                             <input type="radio" name="regmid" value="{{ item[3] }}" required>
+                            <input type="hidden" name="regcid" value="{{ item[1] }}" required>
+                            <input type="hidden" name="regsid" value="{{ item[8] }}" required>
+                            <input type="hidden" name="regdate" value="{{ item[0] }}" required>
+
+
                         </td>
                         <td>{{ item[3] }}</td>
                         <td>{{ item[4] }}</td>
@@ -80,7 +85,7 @@
                         <td>{{ item[1] }}</td>
                         <td>{{ item[2] }}</td>
                         <td>{{ item[0] }}</td>
-                        <td>{{ item[7] }} {{ item[8] }}</td>
+                        <td>{{ item[6] }} {{ item[7] }}</td>
                     </tr>
                 {% endfor %}
             </tbody>

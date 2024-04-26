@@ -25,6 +25,15 @@ def login_required(f):
 
     return decorated_function
 
+def staff_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'staff' not in session and 'admin' not in session:
+            return redirect('/login')
+        return f(*args, **kwargs)
+
+    return decorated_function
+
 
 def create_token(user_id):
     payload = {
