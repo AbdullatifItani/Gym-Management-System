@@ -1,4 +1,6 @@
 from flask import request, session, redirect, render_template
+
+from EECE433Project.app import bcrypt
 from EECE433Project.helper_functions import create_token
 
 
@@ -8,14 +10,14 @@ def register(conn):
         lname = request.form["lname"]
         email = request.form["email"]
         password = request.form["password"]
-        # password_hash = bcrypt.generate_password_hash(password)
+        password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
         gender = request.form["gender"]
         dob = request.form["dob"]
         contact = request.form["contact"]
         cursor = conn.cursor()
         cursor.execute("""INSERT INTO MEMBER (FNAME, LNAME, GENDER, DOB, EMAIL, PASS, CONTACT, JOININGDATE)
                         VALUES (%s, %s, %s, %s, %s, %s, %s, 'now()')""",
-                       (fname, lname, gender, dob, email, password, contact))
+                       (fname, lname, gender, dob, email, password_hash, contact))
         conn.commit()
         cursor.execute("select mid from member where email =%s", (email,))
         data = cursor.fetchone()
