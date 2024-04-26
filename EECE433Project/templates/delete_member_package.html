@@ -21,7 +21,7 @@
             padding: 20px;
             border-radius: 5px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            width: 400px; /* Adjust width as needed */
+            width: 700px; /* Adjust width as needed */
         }
         select, input[type="submit"] {
             width: 100%;
@@ -30,6 +30,19 @@
             border: 1px solid #ccc;
             border-radius: 4px;
             box-sizing: border-box;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
         }
         input[type="submit"] {
             background-color: #ff4444;
@@ -59,6 +72,7 @@
     </form>
     {% else %}
     <h3>Select Package:</h3>
+        <form method="POST">
         <table>
             <thead>
                 <tr>
@@ -66,15 +80,15 @@
                     <th>Package ID</th>
                     <th>Package Name</th>
                     <th>Description</th>
-                    <th>Price</th>
-                    <th>Duration</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
                 </tr>
             </thead>
             <tbody>
                 {% for package in member_packages %}
                 <tr>
                     <td>
-                        <input type="radio" name="ppid" value="{{ package[0] }}|{{ package[4] }}" required>
+                        <input type="radio" name="selected_package" value="{{ package[0] }}|{{ package[3] }}" required>
                     </td>
                     <td>{{ package[0] }}</td>
                     <td>{{ package[1] }}</td>
@@ -85,7 +99,7 @@
                 {% endfor %}
             </tbody>
         </table>
-        <input type="submit" value="Assign Member Package">
+        <input type="submit" value="Delete Member Package">
     </form>
     {% endif %}
 </div>

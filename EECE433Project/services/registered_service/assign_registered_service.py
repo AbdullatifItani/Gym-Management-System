@@ -1,9 +1,14 @@
-from flask import request, redirect, render_template
+from flask import request, redirect, render_template, session
+
+from EECE433Project.helper_functions import decode_token
 
 
 def assign_registered(conn):
     if request.method == "POST":
-        regmid = request.form["regmid"]
+        if 'admin' in session:
+            regmid = request.form["regmid"]
+        else:
+            regmid = decode_token(session['token'])
         regsid = request.form["regsid"]
         regcid = request.form["regcid"]
         regdate = request.form["regdate"]
@@ -16,8 +21,12 @@ def assign_registered(conn):
         return redirect("/admin")
     # Fetch equipment and staff data to populate dropdowns
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM MEMBER")
-    member_data = cursor.fetchall()
-    cursor.execute("SELECT MEMBER.MID, MEMBER.FNAME, MEMBER.LNAME, CLASS.CID, CLASS.CNAME, SESSION.SDATE, STAFF.FNAME, STAFF.LNAME, STAFF.SID FROM MEMBER INNER JOIN REGISTERED ON MEMBER.MID = REGISTERED.REGMID INNER JOIN SESSION ON REGISTERED.REGSID = SESSION.SCID INNER JOIN CLASS ON SESSION.SCID = CLASS.CID INNER JOIN STAFF ON SESSION.SSID = STAFF.SID")
+    cursor.execute(
+        "SELECT CLASS.CID, CLASS.CNAME, SESSION.SDATE, STAFF.FNAME, STAFF.LNAME, STAFF.SID FROM CLASS INNER JOIN SESSION ON CLASS.CID = SESSION.SCID INNER JOIN STAFF ON SESSION.SSID = STAFF.SID")
     session_data = cursor.fetchall()
-    return render_template("assign_registered.html", members=member_data, sessions=session_data)
+    if 'admin' in session:
+        cursor.execute("SELECT * FROM MEMBER")
+        member_data = cursor.fetchall()
+        return render_template("assign_registered.html", members=member_data, sessions=session_data)
+    else:
+        return render_template("assign_registered.html", sessions=session_data)

@@ -21,7 +21,7 @@ def assign_member_package(conn):
         if existing_package:
             cursor.execute("SELECT * FROM PACKAGE")
             package_data = cursor.fetchall()
-            return render_template("assign_member_package.html", packages=package_data, error="You already has an "
+            return render_template("assign_member_package.html", packages=package_data, error="You already have an "
                                                                                               "existing package!")
 
         cursor.execute("""INSERT INTO MEMBER_PACKAGE (PPID, PMID)

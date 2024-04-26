@@ -10,10 +10,10 @@ def create_review(conn):
         mid = decode_token(token)
         cursor = conn.cursor()
         cursor.execute("""INSERT INTO REVIEW (DESCRIPTION)
-                        VALUES (%s)""",
+                          VALUES (%s)
+                          RETURNING RID""",
                        (description,))
         conn.commit()
-        cursor.execute("""SELECT RID FROM REVIEW""")
         if 'admin' not in session:
             rid = cursor.fetchone()[0]
             cursor.execute("""INSERT INTO MEMBER_REVIEW (RMID, RRID)

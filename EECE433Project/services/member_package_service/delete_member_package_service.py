@@ -13,10 +13,15 @@ def delete_member_package(conn):
             conn.commit()
             return redirect("/admin")
         else:
-            ppid = request.form["ppid"]
-            pmid
+            selected_package = request.form.get('selected_package')
+
+            if selected_package:
+                ppid, pdate = selected_package.split('|')
+            pmid = decode_token(session['token'])
             cursor = conn.cursor()
-            cursor.execute()
+            cursor.execute("DELETE FROM MEMBER_PACKAGE WHERE PMID = %s and ppid = %s and start_date=%s", (pmid, ppid, pdate))
+            conn.commit()
+            return redirect("/")
 
     # Fetch member and package data to populate dropdowns
     cursor = conn.cursor()
@@ -24,11 +29,10 @@ def delete_member_package(conn):
         cursor.execute("SELECT * FROM MEMBER_PACKAGE")
         member_packages = cursor.fetchall()
     else:
-        pmid = decode_token(session['token'])
-        cursor.execute("""SELECT * FROM MEMBER_PACKAGE
-                            WHERE PMID = %s AND END_DATE >= CURRENT_DATE""",
-                       (pmid,))
-
-        member_packages = cursor.fetchone()
+        member_id = decode_token(session['token'])
+        cursor.execute(
+            "SELECT PACKAGE.PID, PACKAGE.PNAME, PACKAGE.DESCRIPTION, MEMBER_PACKAGE.START_DATE, MEMBER_PACKAGE.END_DATE FROM PACKAGE INNER JOIN MEMBER_PACKAGE ON PACKAGE.PID = MEMBER_PACKAGE.PPID WHERE MEMBER_PACKAGE.PMID = %s",
+            (member_id,))
+        member_packages = cursor.fetchall()
 
     return render_template("delete_member_package.html", member_packages=member_packages)

@@ -18,7 +18,7 @@ conn = psycopg2.connect(
 
 from EECE433Project.services import admin_service
 from EECE433Project.services.registered_service import assign_registered_service, delete_registered_service, \
-    display_registered_members_of_each_session_service, display_registered_sessions_of_each_member_service 
+    display_registered_members_of_each_session_service, display_registered_sessions_of_each_member_service
 from EECE433Project.services.session_service import assign_session_service, delete_session_service, \
     display_classes_of_staff_service
 from EECE433Project.services.staff_service import create_staff_service, update_staff_service, delete_staff_service, \
@@ -168,7 +168,6 @@ def delete_package():
 
 
 @app.route('/display_packages', methods=['GET'])
-@login_required
 def display_packages():
     return display_packages_service.display_packages(conn)
 
@@ -216,8 +215,8 @@ def create_review():
 def delete_review():
     return delete_review_service.delete_review(conn)
 
+
 @app.route('/display_reviews', methods=["GET"])
-@login_required
 def display_reviews():
     return display_reviews_service.display_reviews(conn)
 
@@ -392,6 +391,7 @@ def assign_logs():
 def delete_logs():
     return delete_logs_service.delete_logs(conn)
 
+
 @app.route('/display_logs', methods=['GET'])
 @admin_required
 def display_logs():
@@ -413,11 +413,11 @@ def assign_session():
 def delete_session():
     return delete_session_service.delete_session(conn)
 
+
 @app.route('/display_classes_of_staff', methods=['GET'])
 @login_required
 def display_classes_of_staff():
     return display_classes_of_staff_service.display_classes_of_staff(conn)
-
 
 
 # Session Service End #
@@ -435,15 +435,19 @@ def assign_registered():
 def delete_registered():
     return delete_registered_service.delete_registered(conn)
 
+
 @app.route('/display_registered_members_of_each_session', methods=['GET'])
 @admin_required
 def display_registered_members_of_each_session():
     return display_registered_members_of_each_session_service.display_registered_members_of_each_session(conn)
 
+
 @app.route('/display_registered_sessions_of_each_member', methods=['GET'])
 @login_required
 def display_registered_sessions_of_each_member():
     return display_registered_sessions_of_each_member_service.display_registered_sessions_of_each_member(conn)
+
+
 # Registered Service End #
 
 

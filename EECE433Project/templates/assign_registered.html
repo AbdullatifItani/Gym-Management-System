@@ -6,45 +6,66 @@
     <title>Assign Registered</title>
     <link rel="stylesheet" href="static/styles.css">
 </head>
+<style>
+    input[type="submit"] {
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+        input[type="submit"] {
+            width: 25%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+</style>
 <body>
 
     <div class="container">
         <h2>Assign Registered</h2>
         <form method="POST">
             <label for="regmid">Select Member:</label>
+            {% if 'admin' in session %}
             <select name="regmid" id="regmid">
                 {% for member in members %}
                     <option value="{{ member[0] }}">{{ member[1] }} {{ member[2] }}</option>
                 {% endfor %}
             </select>
+            {% endif %}
             <label for="regsid">Select Session:</label>
             <table>
                 <thead>
                     <tr>
-                        <th>Session ID</th>
-                        <th>Session Name</th>
+                        <th>Select</th>
+                        <th>Class ID</th>
+                        <th>Class Name</th>
                         <th>Session Date</th>
                         <th>Staff Name</th>
-                        <th>Assign</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for session in sessions %}
                         <tr>
-                            <td>{{ session[3] }}</td>
-                            <td>{{ session[4] }}</td>
-                            <td>{{ session[5] }}</td>
-                            <td>{{ session[6] }} {{ session[7] }}</td>
                             <td>
-                                <input type="checkbox" name="regsid" value="{{ session[8] }}">
-                                <input type="hidden" name="regcid" value="{{ session[3] }}">
-                                <input type="hidden" name="regdate" value="{{ session[5] }}">
+                                <input type="checkbox" name="regsid" value="{{ session[5] }}">
+                                <input type="hidden" name="regcid" value="{{ session[0] }}">
+                                <input type="hidden" name="regdate" value="{{ session[2] }}">
                             </td>
-                        </tr>
+                            <td>{{ session[0] }}</td>
+                            <td>{{ session[1] }}</td>
+                            <td>{{ session[2] }}</td>
+                            <td>{{ session[3] }} {{ session[4] }}</td>
                     {% endfor %}
                 </tbody>
             </table>
-            <button type="submit">Assign Registered</button>
+            <input type="submit" value="Assign Registered"/>
         </form>
         {% if error %}
             <p class="error">{{ error }}</p>
