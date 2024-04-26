@@ -31,8 +31,8 @@
     <div class="container">
         <h2>Assign Registered</h2>
         <form method="POST">
-            <label for="regmid">Select Member:</label>
             {% if 'admin' in session %}
+            <label for="regmid">Select Member:</label>
             <select name="regmid" id="regmid">
                 {% for member in members %}
                     <option value="{{ member[0] }}">{{ member[1] }} {{ member[2] }}</option>
@@ -54,9 +54,8 @@
                     {% for session in sessions %}
                         <tr>
                             <td>
-                                <input type="checkbox" name="regsid" value="{{ session[5] }}">
-                                <input type="hidden" name="regcid" value="{{ session[0] }}">
-                                <input type="hidden" name="regdate" value="{{ session[2] }}">
+                                <input type="radio" name="regsid" value="{{ session[5] }}" 
+                                        cid="{{ session[0] }}" date="{{ session[2] }}">
                             </td>
                             <td>{{ session[0] }}</td>
                             <td>{{ session[1] }}</td>
@@ -66,11 +65,28 @@
                 </tbody>
             </table>
             <input type="submit" value="Assign Registered"/>
+            <input type="hidden" name="regcid" id="regcid" value="">
+            <input type="hidden" name="regdate" id="regdate" value="">
         </form>
         {% if error %}
             <p class="error">{{ error }}</p>
         {% endif %}
     </div>
+    <script>
+        // Get all radio buttons
+        var radioButtons = document.querySelectorAll('input[type="radio"][name="regsid"]');
+        // Attach click event listener to each radio button
+        radioButtons.forEach(function(radioButton) {
+            radioButton.addEventListener('click', function() {
+                // Get data attributes cid and date
+                var cid = this.getAttribute('cid');
+                var date = this.getAttribute('date');
+                // Set the value of hidden fields regcid and regdate
+                document.getElementById('regcid').value = cid;
+                document.getElementById('regdate').value = date;
+            });
+        });
+    </script>
     
     </body>
-    </html>
+    </html>

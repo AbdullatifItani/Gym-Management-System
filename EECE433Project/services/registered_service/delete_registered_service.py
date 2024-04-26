@@ -4,13 +4,15 @@ from EECE433Project.helper_functions import decode_token
 
 def delete_registered(conn):
     if request.method == "POST":
+        regvalues = request.form["reg"]
+        reg_values_list = regvalues.split("|")
         if 'admin' in session:
-            regmid = request.form["regmid"]
+            regmid = reg_values_list[0]
         else:
             regmid = decode_token(session['token'])
-        regcid = request.form["regcid"]
-        regsid = request.form["regsid"]
-        regdate = request.form["regdate"]
+        regcid = reg_values_list[1]
+        regsid = reg_values_list[2]
+        regdate = reg_values_list[3]
 
         cursor = conn.cursor()
         cursor.execute("DELETE FROM REGISTERED WHERE REGMID = %s AND REGCID = %s AND REGSID = %s AND REGDATE = %s",

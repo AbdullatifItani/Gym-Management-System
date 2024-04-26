@@ -18,7 +18,7 @@ def assign_registered(conn):
                           VALUES (%s, %s, %s, %s)""",
                        (regmid, regsid, regcid, regdate))
         conn.commit()
-        return redirect("/admin")
+        return redirect("/")
     # Fetch equipment and staff data to populate dropdowns
     cursor = conn.cursor()
     cursor.execute(

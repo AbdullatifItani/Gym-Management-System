@@ -466,6 +466,62 @@ def display_registered_sessions_of_each_member():
 
 # Registered Service End #
 
+@app.errorhandler(psycopg2.IntegrityError)
+def handle_psycopg2_integrity_error(e):
+    error_msg = str(e)
+    if 'duplicate key' in error_msg:
+        error_message = "Key already exists."
+    elif 'null value' in error_msg:
+        error_message = "Fields cannot be empty."
+    elif 'violates foreign key constraint' in error_msg:
+        error_message = "Foreign key constraint violation."
+    else:
+        error_message = "Unknown constraint violation."
+
+    # Render an appropriate template with the error message
+    return render_template('error.html', error_message=error_message), 400
+
+@app.errorhandler(404)
+def handle_not_found_error(e):
+    # Handle 404 errors
+    return render_template('404.html'), 404
+
+from flask import render_template
+
+@app.errorhandler(ValueError)
+def handle_value_error(e):
+    return render_template('error.html', error_message=str(e)), 400
+
+@app.errorhandler(TypeError)
+def handle_type_error(e):
+    return render_template('error.html', error_message=str(e)), 400
+
+@app.errorhandler(PermissionError)
+def handle_permission_error(e):
+    return render_template('error.html', error_message=str(e)), 403
+
+@app.errorhandler(IOError)
+def handle_io_error(e):
+    return render_template('error.html', error_message=str(e)), 500
+
+@app.errorhandler(ConnectionError)
+def handle_connection_error(e):
+    return render_template('error.html', error_message=str(e)), 500
+
+@app.errorhandler(TimeoutError)
+def handle_timeout_error(e):
+    return render_template('error.html', error_message=str(e)), 504
+
+@app.errorhandler(500)
+def handle_internal_server_error(e):
+    return render_template('error.html', error_message='Internal Server Error'), 500
+
+@app.errorhandler(psycopg2.errors.InFailedSqlTransaction)
+def handle_transaction_failed_error(e):
+    return render_template('error.html', error_message='Transaction Failed, Please Restart the Server:'), 500
+
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)
