@@ -71,6 +71,10 @@ def about():
     return render_template("about.html")
 
 
+@app.route('/update_info')
+def update():
+    return render_template("personal.html")
+
 @app.route('/admin')
 @admin_required
 def admin():

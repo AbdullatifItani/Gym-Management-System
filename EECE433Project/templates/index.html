@@ -57,6 +57,53 @@
         .button-container a:hover {
             background-color: #555;
         }
+        .dropdown {
+            float: right;
+            overflow: hidden;
+        }
+
+        /* Dropdown button */
+        .dropdown .dropbtn {
+            color: white;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            background-color: inherit;
+        }
+
+        /* The container <div> - needed to position the dropdown content */
+        .dropdown .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #333;
+            min-width: 160px;
+            z-index: 1;
+            border-radius: 5px;
+        }
+        .dropdown .dropbtn img {
+            height: 50px; /* Adjust the height to your preference */
+            width: 50px;
+            margin-right: 50px;
+        }
+
+        /* Links inside the dropdown */
+        .dropdown .dropdown-content a {
+            color: #f2f2f2;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+        }
+
+        /* Change color of dropdown links on hover */
+        .dropdown .dropdown-content a:hover {
+            background-color: #555;
+        }
+
+        /* Show the dropdown menu on hover */
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -71,7 +118,16 @@
     <a href="/register" style="float: right;">Register</a>
     <a href="/login" style="float: right;">Login</a>
     {% else %}
-    <a href="/logout" style="float: right;">Logout</a>
+    <div class="dropdown">
+        <button class="dropbtn">
+            <img src="{{ url_for('static', filename='default.png') }}" alt="Logout Icon">
+        </button>
+        <div class="dropdown-content">
+            <a href="/view_member">View your info</a>
+            <a href="/update_info">Update your info</a>
+            <a href="/logout">Logout</a>
+        </div>
+    </div>
     {% endif %}
     {% if session['admin'] == True %}
     <a href="/admin">Admin Panel</a>
