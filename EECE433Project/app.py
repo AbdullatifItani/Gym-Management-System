@@ -54,6 +54,18 @@ def index():
     return render_template("index.html")
 
 
+@app.route('/classes')
+def classes():
+    return render_template("classes.html")
+
+@app.route('/packages')
+def packages():
+    return render_template("packages.html")
+
+@app.route('/reviews')
+def reviews():
+    return render_template("reviews.html")
+
 @app.route('/about')
 def about():
     return render_template("about.html")

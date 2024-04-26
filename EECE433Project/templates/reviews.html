@@ -3,20 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Classes Page</title>
+    <title>Gym Homepage</title>
     <style>
         body {
             margin: 0;
             padding: 0;
             font-family: Arial, sans-serif;
-            background-image: url('{{ url_for("static", filename="reviews.jpg") }}');
-            background-size: cover;
+            background-image: url('{{ url_for("static", filename="class-4.jpg") }}');
+            background-size: cover; /* Make the background image cover the entire screen */
         }
-        .button-container {
-            text-align: center;
-            margin-top: 50vh; /* Adjusted margin to center vertically */
-            transform: translateY(-50%);
+        .button-container h2 {
             color: white;
+            font-size: 36px;
+            margin-top: 50px;
+            margin-bottom: 300px;
         }
         .navbar {
             background-color: #333;
@@ -38,6 +38,10 @@
             height: 20px;
             width: auto;
         }
+        .button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
         .button-container a {
             margin: 10px;
             padding: 15px 30px;
@@ -57,29 +61,28 @@
 </head>
 <body>
 
-    <div class="navbar">
-        <a href="/">
-            <img src='{{ url_for("static", filename="logo.png") }}' alt="Logo">
-        </a>
-        <a href="/">Home</a>
-        <a href="/contact">Contact</a>
-        {% if not session['token'] %}
-        <a href="/register" style="float: right;">Register</a>
-        <a href="/login" style="float: right;">Login</a>
-        {% else %}
-        <a href="/logout" style="float: right;">Logout</a>
-        {% endif %}
-        {% if session['admin'] == True %}
-        <a href="/admin">Admin Panel</a>
-        {% endif %}
-    </div>
+<div class="navbar">
+    <a href="/">
+        <img src='{{ url_for("static", filename="logo.png") }}' alt="Logo">
+    </a>
+    <a href="/">Home</a>
+    <a href="/about">About</a>
+    {% if not session['token'] %}
+    <a href="/register" style="float: right;">Register</a>
+    <a href="/login" style="float: right;">Login</a>
+    {% else %}
+    <a href="/logout" style="float: right;">Logout</a>
+    {% endif %}
+    {% if session['admin'] == True %}
+    <a href="/admin">Admin Panel</a>
+    {% endif %}
+</div>
 
 <div class="button-container">
-    <h2>EECE 433 Project</h2>
-    <h2>Wael Dgheim</h2>
-    <h2>Sarjoon Radiyah</h2>
-    <h2>Abdullatif Itani</h2>
-    <h2>Antoine Abou Faycal</h2>
+    <h2>Give us you feedback!</h2>
+    <a href="/create_review">Create a review</a>
+    <a href="/delete_review">Delete your review</a>
+    <a href="/display_reviews">Display All Reviews</a>
 </div>
 
 </body>

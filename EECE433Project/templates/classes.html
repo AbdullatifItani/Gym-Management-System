@@ -9,14 +9,13 @@
             margin: 0;
             padding: 0;
             font-family: Arial, sans-serif;
-            background-image: url('{{ url_for("static", filename="reviews.jpg") }}');
+            background-image: url('{{ url_for("static", filename="hero-1.jpg") }}');
             background-size: cover;
         }
         .button-container {
             text-align: center;
             margin-top: 50vh; /* Adjusted margin to center vertically */
             transform: translateY(-50%);
-            color: white;
         }
         .navbar {
             background-color: #333;
@@ -75,11 +74,11 @@
     </div>
 
 <div class="button-container">
-    <h2>EECE 433 Project</h2>
-    <h2>Wael Dgheim</h2>
-    <h2>Sarjoon Radiyah</h2>
-    <h2>Abdullatif Itani</h2>
-    <h2>Antoine Abou Faycal</h2>
+    <a href="/assign_member_gym_session">Register for a Gym Session</a>
+    <a href="/delete_member_gym_session">Unregister for a Gym Session</a>
+    <a href="/display_classes_of_staff">Display Sessions Available for Registering</a>
+    <a href="/display_member_gym_sessions">Display Your Registered Gym Sessions</a>
+    <a href="/assign_registered">Register for a Session</a>
 </div>
 
 </body>
