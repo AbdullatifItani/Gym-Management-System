@@ -3,12 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Navigation Bar</title>
+    <title>Gym Homepage</title>
     <style>
         body {
             margin: 0;
             padding: 0;
             font-family: Arial, sans-serif;
+            background-image: url('{{ url_for("static", filename="homepage1.jpg") }}');
+            background-size: cover;
+        }
+        .button-container h2 {
+            color: white;
+            font-size: 36px;
+            margin-top: 50px;
+            margin-bottom: 300px;
         }
         .navbar {
             background-color: #333;
@@ -26,17 +34,24 @@
             background-color: #ddd;
             color: black;
         }
+        .navbar img {
+            height: 20px;
+            width: auto;
+        }
         .button-container {
-            padding: 20px;
             text-align: center;
+            margin-top: 20px;
         }
         .button-container a {
-            margin: 5px;
-            padding: 10px 15px;
+            margin: 10px;
+            padding: 15px 30px;
             background-color: #333;
             color: #f2f2f2;
             text-decoration: none;
             border-radius: 5px;
+            font-size: 16px;
+            text-transform: uppercase;
+            transition: background-color 0.3s ease;
         }
         .button-container a:hover {
             background-color: #555;
@@ -46,9 +61,11 @@
 <body>
 
 <div class="navbar">
+    <a href="/">
+        <img src='{{ url_for("static", filename="logo.png") }}' alt="Logo">
+    </a>
     <a href="/">Home</a>
     <a href="/about">About</a>
-    <a href="/contact">Contact</a>
     {% if not session['token'] %}
     <a href="/register" style="float: right;">Register</a>
     <a href="/login" style="float: right;">Login</a>
@@ -61,33 +78,10 @@
 </div>
 
 <div class="button-container">
-    <h2>Member Panel</h2>
-    <a href="/view_member">View your info</a><br><br><br>
-    <a href="/update_member_contact">Update Member Contact</a><br>
-    <br><br>
-    <a href="/assign_emergency_contact">Assign Emergency Contact</a>
-    <a href="/update_emergency_contact">Update Emergency Contact</a>
-    <a href="/delete_emergency_contact">Delete Emergency Contact</a>
-    <a href="/display_emergency_contacts">Display Emergency Contacts</a><br>
-    <br><br>
-    <a href="/display_packages">Display Packages</a><br>
-    <br><br>
-    <a href="/assign_member_package">Register in a package</a>
-    <a href="/delete_member_package">Unregister from a package</a>
-    <a href="/display_member_packages">Your Packages</a><br>
-    <br><br>
-    <a href="/create_review">Create a review</a>
-    <a href="/delete_review">Delete your review</a><br>
-    <a href="/display_reviews">Display All Reviews</a>
-    <br><br>
-    <a href="/assign_member_gym_session">Register for a Gym Session</a>
-    <a href="/delete_member_gym_session">Unregister for a Gym Session</a>
-    <a href="/display_member_gym_sessions">Display Your Registered Gym Sessions</a>
-    <a href="/display_classes_of_staff">Display Sessions Available for Registering</a>
-    <a href="/assign_registered">Register for a Session</a>
-    <a href="/delete_registered">Unregister for a Session</a>
-    <a href="/display_registered_sessions_of_each_member">Display Your Registered Sessions</a>
-
+    <h2>Welcome to Our Gym</h2>
+    <a href="/classes">Check out our classes</a>
+    <a href="/packages">See our packages</a>
+    <a href="/reviews">View our reviews</a>
 </div>
 
 </body>

@@ -46,13 +46,25 @@ from EECE433Project.services.logs_service import assign_logs_service, delete_log
     display_logs_service
 from EECE433Project.services.review_service import create_review_service, delete_review_service, \
     display_reviews_service
-from EECE433Project.helper_functions import admin_required, login_required
+from EECE433Project.helper_functions import admin_required, login_required, staff_required
 
 
 @app.route('/')
 def index():
     return render_template("index.html")
 
+
+@app.route('/classes')
+def classes():
+    return render_template("classes.html")
+
+@app.route('/packages')
+def packages():
+    return render_template("packages.html")
+
+@app.route('/reviews')
+def reviews():
+    return render_template("reviews.html")
 
 @app.route('/about')
 def about():
@@ -397,7 +409,7 @@ def delete_logs():
 
 
 @app.route('/display_logs', methods=['GET'])
-@admin_required
+@staff_required
 def display_logs():
     return display_logs_service.display_logs(conn)
 
@@ -407,13 +419,13 @@ def display_logs():
 
 
 @app.route('/assign_session', methods=["GET", "POST"])
-@login_required
+@staff_required
 def assign_session():
     return assign_session_service.assign_session(conn)
 
 
 @app.route('/delete_session', methods=["GET", "POST"])
-@admin_required
+@staff_required
 def delete_session():
     return delete_session_service.delete_session(conn)
 
@@ -453,6 +465,62 @@ def display_registered_sessions_of_each_member():
 
 
 # Registered Service End #
+
+@app.errorhandler(psycopg2.IntegrityError)
+def handle_psycopg2_integrity_error(e):
+    error_msg = str(e)
+    if 'duplicate key' in error_msg:
+        error_message = "Key already exists."
+    elif 'null value' in error_msg:
+        error_message = "Fields cannot be empty."
+    elif 'violates foreign key constraint' in error_msg:
+        error_message = "Foreign key constraint violation."
+    else:
+        error_message = "Unknown constraint violation."
+
+    # Render an appropriate template with the error message
+    return render_template('error.html', error_message=error_message), 400
+
+@app.errorhandler(404)
+def handle_not_found_error(e):
+    # Handle 404 errors
+    return render_template('404.html'), 404
+
+from flask import render_template
+
+@app.errorhandler(ValueError)
+def handle_value_error(e):
+    return render_template('error.html', error_message=str(e)), 400
+
+@app.errorhandler(TypeError)
+def handle_type_error(e):
+    return render_template('error.html', error_message=str(e)), 400
+
+@app.errorhandler(PermissionError)
+def handle_permission_error(e):
+    return render_template('error.html', error_message=str(e)), 403
+
+@app.errorhandler(IOError)
+def handle_io_error(e):
+    return render_template('error.html', error_message=str(e)), 500
+
+@app.errorhandler(ConnectionError)
+def handle_connection_error(e):
+    return render_template('error.html', error_message=str(e)), 500
+
+@app.errorhandler(TimeoutError)
+def handle_timeout_error(e):
+    return render_template('error.html', error_message=str(e)), 504
+
+@app.errorhandler(500)
+def handle_internal_server_error(e):
+    return render_template('error.html', error_message='Internal Server Error'), 500
+
+@app.errorhandler(psycopg2.errors.InFailedSqlTransaction)
+def handle_transaction_failed_error(e):
+    return render_template('error.html', error_message='Transaction Failed, Please Restart the Server:'), 500
+
+
 
 
 if __name__ == '__main__':

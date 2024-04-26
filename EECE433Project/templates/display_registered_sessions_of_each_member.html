@@ -8,6 +8,7 @@
 </head>
 <body>
 <div class="container">
+    {% if 'admin' in session %}
     <h1>Registered Sessions of Each Member</h1>
     <form action="/display_registered_sessions_of_each_member" method="GET">
         <label for="member_id">Select Member:</label>
@@ -19,6 +20,9 @@
         </select>
         <button type="submit">Show Registered Sessions</button>
     </form>
+    {% else %}
+    <h1>Your registered sessions</h1>
+    {% endif %}
 
     <table>
         <thead>
