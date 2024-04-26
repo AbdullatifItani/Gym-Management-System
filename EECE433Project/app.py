@@ -38,7 +38,7 @@ from .services.package_service import create_package_service, update_package_ser
 from EECE433Project.services.member_package_service import assign_member_package_service, delete_member_package_service, \
     display_package_members_service, display_member_packages_service
 from EECE433Project.services.member_service import create_member_service, update_member_contact_service, \
-    delete_member_service, display_members_service
+    delete_member_service, display_members_service, view_member_service
 from EECE433Project.services.emergency_contact_service import assign_emergency_contact_service, \
     update_emergency_contact_service, delete_emergency_contact_service, display_emergency_contacts_service
 from EECE433Project.services.auth_service import login_service, register_service
@@ -115,6 +115,10 @@ def delete_member():
 @admin_required
 def display_members():
     return display_members_service.display_members(conn)
+
+@app.route('/view_member', methods=["GET"])
+def view_member():
+    return view_member_service.view_member(conn)
 
 
 # Member Service End #
