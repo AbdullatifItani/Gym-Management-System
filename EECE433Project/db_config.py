@@ -1,4 +1,4 @@
-DB_NAME = 'Gym'
+DB_NAME = 'gym'
 DB_USER = 'postgres'
 DB_PASSWORD = 'Abed12345'
 DB_HOST = '127.0.0.1'
