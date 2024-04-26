@@ -46,7 +46,7 @@ from EECE433Project.services.logs_service import assign_logs_service, delete_log
     display_logs_service
 from EECE433Project.services.review_service import create_review_service, delete_review_service, \
     display_reviews_service
-from EECE433Project.helper_functions import admin_required, login_required
+from EECE433Project.helper_functions import admin_required, login_required, staff_required
 
 
 @app.route('/')
@@ -397,7 +397,7 @@ def delete_logs():
 
 
 @app.route('/display_logs', methods=['GET'])
-@admin_required
+@staff_required
 def display_logs():
     return display_logs_service.display_logs(conn)
 
@@ -407,13 +407,13 @@ def display_logs():
 
 
 @app.route('/assign_session', methods=["GET", "POST"])
-@login_required
+@staff_required
 def assign_session():
     return assign_session_service.assign_session(conn)
 
 
 @app.route('/delete_session', methods=["GET", "POST"])
-@admin_required
+@staff_required
 def delete_session():
     return delete_session_service.delete_session(conn)
 
